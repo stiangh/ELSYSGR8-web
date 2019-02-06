@@ -1,0 +1,134 @@
+:root {
+	--theme-c-1: navy;
+	--theme-c-2: white;
+	--theme-c-3: darkBlue;
+	--graph-bgc: ghostWhite;
+}
+body {
+	width: 100%;
+	background: var(--theme-c-2);
+	position: relative;
+	left: -8px;
+	top: -8px;
+	font-family: arial, sans-serif;
+}
+#header {
+	width: 100%;
+	height: 50%;
+	background: var(--theme-c-1);
+	margin-bottom: 0;
+	border: none;
+}
+/*#header:hover {
+	margin-bottom: 0;
+}*/
+#footer {
+	width: 100%;
+}
+.logo {
+	line-height: 100px;
+	font-size: 275%;
+	font-variant: small-caps;
+	color: var(--theme-c-2);
+	margin-top: 0;
+	margin-bottom: 0;
+	text-align: center;
+	text-shadow: 1px 1px var(--theme-c-2);
+	
+}
+.test {
+	display: none;
+	width: 100%;
+	height: 40px;
+	background: darkSlateBlue;
+}
+#header:hover .nav-bar {
+	display: flex;
+}
+.nav-bar {
+	display: none;
+}
+.nav-box {
+	flex: 1;
+	width: 100%;
+	height: 40px;
+	background: var(--theme-c-3);
+	text-align: center;
+	line-height: 40px;
+}
+.nav-box a {
+	color: var(--theme-c-2);
+	font-variant: small-caps;
+	font-weight: 600;
+	text-decoration: none;
+}
+.nav-box:hover {
+	background: var(--theme-c-1);
+}
+#header .placeholder {
+	height: 40px;
+	width: 100%;
+	background: var(--theme-c-2);
+	border: none;
+}
+#header:hover .placeholder {
+	display: none;
+}
+#header *::selection {
+	background-color: transparent;
+}
+#header-wrapper {
+	display: flex;
+}
+#logobox {
+	flex: 3;
+	overflow: hidden;
+}
+#loginbox {
+	flex: 2;
+	margin: auto;
+	text-align: center;
+}
+#loginbox input {
+	box-sizing: border-box;
+	margin: 1px;
+	width: 70%;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+#content {
+	min-height: 500px;
+	width: 80%;
+	margin: auto;
+	padding-top: 4px;
+}
+#content h1 {
+	text-align: center;
+	/* padding-top: 4px; */
+}
+/*#content p {
+	
+}*/
+#footer {
+	height: 100px;
+	background: var(--theme-c-1);
+	float: down;
+	position: relative;
+	top: 16px;
+}
+.dataTable {
+	border-collapse: collapse;
+	margin: auto;
+	min-width: 50%;
+}
+.dataTable th, .dataTable td {
+	border: solid 1px black;
+	text-align: center;
+	padding: 3px 9px 3px 9px;
+}
+.dataTable th:first-letter {
+	text-transform: uppercase;
+}
+.dataTable tr:nth-child(even) {
+	background: lightBlue;
+}

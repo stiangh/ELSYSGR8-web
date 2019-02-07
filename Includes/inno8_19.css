@@ -126,9 +126,19 @@ body {
 	text-align: center;
 	padding: 3px 9px 3px 9px;
 }
-.dataTable th:first-letter {
-	text-transform: uppercase;
+.dataTable th:first-letter, #spn_dataset p span:first-letter {
+	text-transform: capitalize;
 }
 .dataTable tr:nth-child(even) {
 	background: lightBlue;
+}
+#spn_dataset {
+	display: block;
+	text-align: center;
+}
+#spn_dataset input:not([type = "checkbox"]), #spn_dataset select, #spn_dataset button {
+	box-sizing: border-box;
+	height: 25px;
+	width: 140px;
+	margin: 2px;
 }

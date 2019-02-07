@@ -41,6 +41,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.query = "";
 		this.method = "";
 		this.headers = [];
+		this.headerBools = {};
 		this.data = [];
 		this.listeners = [];
 		
@@ -96,7 +97,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.btnPause.addEventListener('click', this.pauseClicked.bind(null, this));
 		this.spanBox.appendChild(this.btnPause);
 
-		this.spnHeaders = document.createElement("span");
+		this.spnHeaders = document.createElement("p");
 		this.spanBox.appendChild(this.spnHeaders);
 		
 		this.updateMethod(this);
@@ -253,10 +254,30 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		if (!compareArrays(obj.headers, headers)) {
 			obj.headers = headers;
 			newHeaders = true;
+			obj.headerBools = {};
+			obj.spnHeaders.innerHTML = "";
+			for (var i = 0; i < obj.headers.length; i++) {
+				var h = obj.headers[i];
+				obj.headerBools[h] = true;
+				var s = document.createElement("span");
+				s.innerHTML = h + ": ";
+				var cb = document.createElement("input");
+				cb.type = "checkbox";
+				cb.checked = true;
+				cb.id = obj.id + "_chk" + h;
+				cb.addEventListener('change', obj.setHeaderBools.bind(null, obj, h));
+				obj.spnHeaders.appendChild(s);
+				obj.spnHeaders.appendChild(cb);
+			}
 		}
 		obj.notifyListeners(obj, newHeaders)
 		
 		return;
+	}
+
+	setHeaderBools(obj, header) {
+		obj.headerBools[header] = !obj.headerBools[header];
+		obj.notifyListeners(obj, false);
 	}
 }
 
@@ -279,11 +300,15 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 	createTable(obj) {
 		var data = obj.dataSet.data;
 		var headers = obj.dataSet.headers;
+		var headerBools = obj.dataSet.headerBools;
 		
 		var table = document.createElement("table");
 		table.className = "dataTable";
 		var tr = document.createElement("tr");
 		for (var i = 0; i < headers.length; i++) {
+			if (!headerBools[headers[i]]) {
+				continue;
+			}
 			var th = document.createElement("th");
 			th.innerHTML = headers[i];
 			tr.appendChild(th);
@@ -293,6 +318,9 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 			var tr = document.createElement("tr");
 			var rowData = data[i];
 			for (var key in rowData) {
+				if (!headerBools[key]) {
+					continue;
+				}
 				var td = document.createElement("td");
 				td.innerHTML = rowData[key];
 				if ((key == "temp") && (parseFloat(rowData[key]) > 100)) {
@@ -489,10 +517,12 @@ class Charts {
 		console.log("updateCharts called");
 
 		var rData = obj.dataset.data;
+		var headerBools = obj.dataset.headerBools;
 
 		for (var header in obj.charts) {
 			var chart = obj.charts[header];
 			chart.data.datasets[0].data = r2c(rData, header);
+			document.getElementById(obj.id + "_cvs_" + header).style.display = (headerBools[header] ? "initial" : "none");
 			chart.update();
 		}
 

@@ -17,18 +17,7 @@
         charts0 = new Charts(id_charts, div_charts, data0);
     }
 </script>
-<style>
-    .hm {
-        text-align: center;
-    }
-    #spn_dataset input, #spn_dataset select, #spn_dataset button {
-        box-sizing: border-box;
-        height: 25px;
-        width: 140px;
-        margin: 2px;
-    }
-</style>
-<p class="hm"><span id="spn_dataset"></span></p>
+<span id="spn_dataset"></span>
 <hr>
 <div id="div_table"></div>
 <div id="div_charts"></div>

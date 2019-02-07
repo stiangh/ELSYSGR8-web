@@ -1,5 +1,5 @@
 <?php
-	include_once "Includes/dbh.php";
+	include_once "../Includes/dbh.php";
 	
 	$sql = "SELECT * FROM ttn_test ORDER BY id DESC LIMIT 1";
 	$res = mysqli_query($conn, $sql);
@@ -33,7 +33,7 @@
 						document.getElementById("txtLed").style.color = ((rt == "true") ? "green" : "red");
 					}
 				};
-				xhttp.open("POST", "Includes/ajax-test.php", true);
+				xhttp.open("POST", "ajax-test.php", true);
 				xhttp.send();
 			}
 		</script>

@@ -1,6 +1,6 @@
 <?php
 	if (!isset($_POST['tfd']) || ($_POST['tfd'] == "")) {
-		header("Location: ../Tester/downlink-test.php?msg=incomplete");
+		header("Location: downlink-test.php?msg=incomplete");
 		die();
 	} 
 	else {
@@ -25,6 +25,6 @@
 
 		curl_close($ch);
 		
-		header("Location: ../Tester/downlink-test.php?msg=success&tfd=$tfd");
+		header("Location: downlink-test.php?msg=success&tfd=$tfd");
 	}
 ?>

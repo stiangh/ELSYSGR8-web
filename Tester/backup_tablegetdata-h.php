@@ -1,5 +1,5 @@
 <?php
-	include_once "dbh.php";
+	include_once "../Incldues/dbh.php";
 	
 	if (!isset($_POST["metode"])) {
 		die();

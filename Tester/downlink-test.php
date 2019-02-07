@@ -74,7 +74,7 @@
 	</head>
 	<body>
 	<!-- <form method="GET" name="dwnlnkform"> -->
-		<form action="../Includes/downlink-test-h.php" method="POST" name="dwnlnkform">
+		<form action="downlink-test-h.php" method="POST" name="dwnlnkform">
 			<p><input type="radio" name="tfd" value=true <?php if ($tc) { echo "checked"; } ?> > <span>Skru på led</span></p>
 			<p><input type="radio" name="tfd" value=false <?php if (!$tc) { echo "checked"; } ?> ><span>Skru av led</span></p>
 			<input name="submit"type="submit" value="Submit">

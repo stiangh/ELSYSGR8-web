@@ -1,5 +1,5 @@
 <?php
-	include_once "dbh.php";
+	include_once "../Includes/dbh.php";
 	
 	$sql = "SELECT * FROM ttn_test ORDER BY id DESC LIMIT 1";
 	$res = mysqli_query($conn, $sql);

@@ -14,15 +14,15 @@
 		<title>AquaTech</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="Includes\inno8_19.css">
-		<script src="Includes\data-classes.js"></script>
+		<link rel="stylesheet" type="text/css" href="..\Includes\inno8_19.css">
+		<script src="..\Includes\data-classes.js"></script>
 		<script>
 			window.onload = oppstart;
 			
 			function oppstart() {
 				var spanBoxId = "spn_dataset";
 				var datasetId = "data0";
-				var handler_url = "Includes/tablegetdata-h.php";
+				var handler_url = "../Includes/tablegetdata-h.php";
 				data0 = new Dataset(datasetId, handler_url, spanBoxId);
 				
 				var tableId = "table0";

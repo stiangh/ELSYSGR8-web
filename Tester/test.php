@@ -17,7 +17,7 @@
 		</script>
 	</head>
 	<body>
-		<form method="POST" action="Includes/tablegetdata-h.php">
+		<form method="POST" action="../Includes/tablegetdata-h.php">
 			<input type="text" name="metode" value="lxs" style="display:none;"><br>
 			<input type="number" name="lxs" value=30><br>
 			<input type="submit" name="submit" value="submit">

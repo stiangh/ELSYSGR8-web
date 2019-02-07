@@ -139,7 +139,7 @@
 						tbl.createTable();
 					}
 				};
-				xhttp.open("POST", "Includes/tablegetdata-h.php", true);
+				xhttp.open("POST", "../Includes/tablegetdata-h.php", true);
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				xhttp.send(qry);
 			}

@@ -19,9 +19,6 @@ body {
 	margin-bottom: 0;
 	border: none;
 }
-/*#header:hover {
-	margin-bottom: 0;
-}*/
 #footer {
 	width: 100%;
 }
@@ -104,11 +101,7 @@ body {
 }
 #content h1 {
 	text-align: center;
-	/* padding-top: 4px; */
 }
-/*#content p {
-	
-}*/
 #footer {
 	height: 100px;
 	background: var(--theme-c-1);

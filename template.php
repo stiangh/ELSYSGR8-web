@@ -42,8 +42,6 @@
 
 			<?php
 				$uri = str_replace("/stiangh/AquaTech", "Content", $_SERVER['SCRIPT_NAME']);
-				//if ($uri === "Content/") {$uri = "Content/index.php";}
-				//$uri = substr($uri, 0, stripos($uri, ".php") + 4);
 				include $uri;
 			?>
 			

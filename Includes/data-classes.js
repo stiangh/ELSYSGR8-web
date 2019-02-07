@@ -21,7 +21,7 @@ function r2c(rData, header) {
 	return cData;
 }
 
-function dateValue(dt) {
+function dateValue(dt) { 
 	var yyyy = dt.getFullYear();
 	var m = dt.getMonth() + 1;
 	var mm = (m < 10 ? "0" : "") + m;
@@ -30,7 +30,7 @@ function dateValue(dt) {
 	return yyyy + "-" + mm + "-" + dd;
 }
 
-class Dataset { // Klasse som innhenter data baser på bruker-input, og informerer Table,Graph om endringer
+class Dataset { // Klasse som innhenter data baser på bruker-input, og informerer Table, Charts om endringer
 	constructor(id, handler_url, spanbox_id) {
 		this.id = id;
 		this.handler = handler_url;
@@ -337,105 +337,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 	}
 }
 
-class Graph {
-	constructor(id, div_id, data_set, width, height) {
-		this.id = id;
-		this.div = document.getElementById(div_id);
-		this.width = width;
-		this.height = height;
-		this.bgColor = "ghostWhite";
-		this.dtColor = "navy";
-		this.lgdColor = "dimGray";
-		this.font = "18px Arial";
-
-		this.canvas = document.createElement("CANVAS");
-		this.canvas.id = this.id + "_cvs";
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
-		this.canvas.style.border = "1px solid black";
-		this.div.style.paddingLeft = "10px";
-		this.div.style.paddingTop = "10px";
-		this.div.appendChild(this.canvas);
-		this.ctx = this.canvas.getContext("2d");
-
-		this.dataset = data_set;
-		this.dataset.addListener(this.dataset, this);
-	}
-
-	getNotification(obj, newHeaders) {
-		console.log("getNotification callled");
-		obj.dataset.pauseClicked(this.dataset);
-		obj.plot(obj);
-		return;
-	}
-
-	plot(obj) {
-		obj.ctx.fillStyle = obj.bgColor;
-		obj.ctx.fillRect(0, 0, obj.width, obj.height);
-		obj.ctx.fillStyle = obj.dtColor;
-		obj.ctx.strokeStyle = obj.dtColor;
-		var data = obj.dataset.data;
-
-		var paddingLeft = 60;
-		var paddingRight = 30;
-		var paddingTop = 30;
-		var paddingBottom = 60;
-
-		var dx = (obj.width - paddingLeft - paddingRight) / (data.length - 1);
-		
-		var tempMin = Infinity;
-		var tempMax = - Infinity;
-		for (var i = 0; i < data.length; i++) {
-			var temp = data[i]["temp"];
-			if (temp > tempMax) {tempMax = temp;}
-			if (temp < tempMin) {tempMin = temp;}
-		}
-		var dy = (obj.height - paddingTop - paddingBottom) / (tempMax - tempMin);
-		
-		for (var i = 0; i < data.length; i++) {
-			var temp = data[i]["temp"];
-			var x = paddingLeft + dx * i;
-			var y = obj.height - paddingBottom - dy * (temp - tempMin);
-			
-			if (i > 0) {
-				obj.ctx.lineTo(x, y);
-				obj.ctx.stroke();
-			}
-
-			obj.ctx.beginPath();
-			obj.ctx.arc(x, y, 3, 0, 2 * Math.PI);
-			obj.ctx.fill();
-
-			if (i != data.lenght - 1) {
-				obj.ctx.beginPath();
-				obj.ctx.moveTo(x, y);
-			}
-		}
-
-		obj.ctx.strokeStyle = obj.lgdColor;
-		obj.ctx.fillStyle = obj.lgdColor;
-		obj.ctx.textAlign = "center";
-		obj.ctx.beginPath();
-		obj.ctx.moveTo(paddingLeft, obj.height - paddingBottom);
-		obj.ctx.lineTo(obj.width - paddingRight, obj.height - paddingBottom);
-		obj.ctx.lineTo(obj.width - paddingRight, paddingTop);
-		obj.ctx.lineTo(paddingLeft, paddingTop);
-		obj.ctx.lineTo(paddingLeft, obj.height - paddingBottom);
-		obj.ctx.stroke();
-
-		obj.ctx.font = obj.font;
-		obj.ctx.fillText(tempMin, paddingLeft / 2, obj.height - paddingBottom);
-		obj.ctx.fillText(tempMax, paddingLeft / 2, paddingTop);
-		obj.ctx.fillText("Temp", paddingLeft / 2, paddingTop + (obj.height - paddingTop - paddingBottom) / 2);
-		obj.ctx.fillText("Tid", paddingLeft + (obj.width - paddingLeft - paddingRight) / 2, obj.height - paddingBottom / 2);
-		obj.ctx.textAlign = "left";
-		obj.ctx.fillText(data[0]["time"], paddingLeft, obj.height - paddingBottom / 2);
-		obj.ctx.textAlign = "right";
-		obj.ctx.fillText(data[data.length - 1]["time"], obj.width - paddingRight, obj.height - paddingBottom / 2);
-	}
-}
-
-class Charts {
+class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkluderes for at denne skal virke)
 	constructor(id, div_id, data_set) {
 		this.id = id;
 		this.div = document.getElementById(div_id);

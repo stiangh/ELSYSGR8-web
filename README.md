@@ -19,9 +19,9 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Dynamisk oppdatering av tabeller og grafer m/AJAX
   - [x] Flere utvalg: Fra Dato til Dato, Siste antall dager, Siste antall målinger
   - [x] Mulighet til velge hvilke parametre som vises i tabeller og grafer
+  - [x] Aliaser \(F.eks \"Temperatur\" istendenfor \"temp\"\)
   - [ ] Mulighet til å fargekode basert på måle-verdiene
   - [ ] Mulighet til eksportere som PNG/CSV-filer
-  - [ ] Aliaser \(F.eks \"Temperatur\" istendenfor \"temp\"\)
 - [ ] Data
   - [x] Temperatur
   - [x] Turbiditet

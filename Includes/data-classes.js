@@ -44,6 +44,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.headerBools = {};
 		this.data = [];
 		this.listeners = [];
+		this.aliases = {};
 		
 		this.slcMethod = document.createElement("select");
 		this.slcMethod.id = this.id + "_slc_method";
@@ -260,7 +261,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 				var h = obj.headers[i];
 				obj.headerBools[h] = true;
 				var s = document.createElement("span");
-				s.innerHTML = h + ": ";
+				s.innerHTML = (h in obj.aliases ? obj.aliases[h] : h);
 				var cb = document.createElement("input");
 				cb.type = "checkbox";
 				cb.checked = true;
@@ -278,6 +279,11 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	setHeaderBools(obj, header) {
 		obj.headerBools[header] = !obj.headerBools[header];
 		obj.notifyListeners(obj, false);
+	}
+
+	setAlias(obj, header, alias) {
+		obj.aliases[header] = alias;
+		return;
 	}
 }
 
@@ -301,6 +307,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		var data = obj.dataSet.data;
 		var headers = obj.dataSet.headers;
 		var headerBools = obj.dataSet.headerBools;
+		var aliases = obj.dataSet.aliases;
 		
 		var table = document.createElement("table");
 		table.className = "dataTable";
@@ -310,7 +317,8 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 				continue;
 			}
 			var th = document.createElement("th");
-			th.innerHTML = headers[i];
+			var h = headers[i];
+			th.innerHTML = (h in aliases ? aliases[h] : h);
 			tr.appendChild(th);
 		}
 		table.appendChild(tr);
@@ -380,6 +388,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 
 	addChart(obj, header, rData) {
 		console.log("addChart called");
+		var aliases = obj.dataset.aliases;
 
 		var cdiv = document.createElement("div");
 		cdiv.className = "chartContainer";
@@ -395,7 +404,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			type: 'line',
 			data: {
 				datasets: [{
-					label: header,
+					label: (header in aliases ? aliases[header] : header),
 					backgroundColor: 'hsla(0, 100%, 70%, 0.6)',
 					borderColor: 'hsla(0, 100%, 70%, 1.0)',
 					data: cData
@@ -420,10 +429,12 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 
 		var rData = obj.dataset.data;
 		var headerBools = obj.dataset.headerBools;
+		var aliases = obj.dataset.aliases;
 
 		for (var header in obj.charts) {
 			var chart = obj.charts[header];
 			chart.data.datasets[0].data = r2c(rData, header);
+			chart.data.datasets[0].label = (header in aliases ? aliases[header] : header);
 			document.getElementById(obj.id + "_cvs_" + header).style.display = (headerBools[header] ? "initial" : "none");
 			chart.update();
 		}

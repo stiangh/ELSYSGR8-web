@@ -11,8 +11,12 @@
         var div_table = "div_table";
         var id_charts = "charts0";
         var div_charts = "div_charts";
+        var aliases = {"id": "Id", "time": "Måletidspunkt", "temp": "Temperatur", "turb": "Turbiditet"};
                 
         data0 = new Dataset(id_dataset, handler_url, spn_dataset);
+        for (var key in aliases) {
+            data0.setAlias(data0, key, aliases[key]);
+        }
         table0 = new Table(id_table, div_table, data0);
         charts0 = new Charts(id_charts, div_charts, data0);
     }

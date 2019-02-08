@@ -28,6 +28,24 @@ function dateValue(dt) {
 	var d = dt.getDate();
 	var dd = (d < 10 ? "0" : "") + d;
 	return yyyy + "-" + mm + "-" + dd;
+
+
+}
+
+function loadWithRequest(method, content, page_url) { // Laster en nettside med f.eks POST
+	var f = document.createElement("form");
+	f.action = page_url;
+	f.method = method.toUpperCase();
+	f.style.display = "none";
+	for (var key in content) {
+		var input = document.createElement("input");
+		input.type = "text";
+		input.name = key;
+		input.value = content[key];
+		f.appendChild(input);
+	}
+	document.body.appendChild(f);
+	f.submit();
 }
 
 class Dataset { // Klasse som innhenter data baser på bruker-input, og informerer Table, Charts om endringer
@@ -284,6 +302,13 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	setAlias(obj, header, alias) {
 		obj.aliases[header] = alias;
 		return;
+	}
+
+	reloadPage(obj) {
+		var method = "POST";
+		var query = obj.query;
+		var url = window.location.origin + window.location.pathname;
+		loadWithRequest(method, {"query": query }, url);
 	}
 }
 

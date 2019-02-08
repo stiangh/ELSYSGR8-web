@@ -7,7 +7,7 @@
 	if ($headers["Authorization"] == "inno19_8") {
 		$json_str = file_get_contents('php://input'); // Pass incoming JSON content to the string $json_str
 		$json_array = json_decode($json_str, true); // Decode JSON-string to an associative array
-		
+
 		// Converting TTN-timestamp to a usable format
 		$datetime = $json_array['metadata']['time'];
 		str_replace('Z', '', $datetime);
@@ -25,12 +25,13 @@
 		
 		// Prepare statements for MySQL-database
 		// The name of the table, the structure and the variables will need to change when we implement more parameters
-		$stmt = $conn->prepare("INSERT INTO data_temp_turb (time, temp, turb) VALUES (?, ?, ?)");
-		$stmt->bind_param('sdd', $p_time, $p_temp, $p_turb);
+		$stmt = $conn->prepare("INSERT INTO phtest (time, temp, turb, ph) VALUES (?, ?, ?, ?)");
+		$stmt->bind_param('sddd', $p_time, $p_temp, $p_turb, $p_ph);
 		
 		$p_time = $phpdate;
 		$p_temp = $json_array['payload_fields']['temp'];
 		$p_turb = $json_array['payload_fields']['turb'];
+		$p_ph = $json_array['payload_fields']['ph'];
 		
 		// Send and close
 		$stmt->execute();

@@ -26,7 +26,7 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Temperatur
   - [x] Turbiditet
   - [x] Timestamp (Fra TTN-Gatewayen som først mottok pakken)
-  - [ ] PH
+  - [x] PH
   - [ ] Konduktivitet
   - [ ] Batteri%
 - [x] Lagring i database

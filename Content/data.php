@@ -1,3 +1,7 @@
+<?php
+    $query = (isset($_POST["query"]) ? $_POST["query"] : "No predefined query");
+    //echo $query;
+?>
 <script src="Includes\Chart.bundle.min.js"></script>
 <script src="Includes\data-classes.js"></script>
 <script>
@@ -11,7 +15,7 @@
         var div_table = "div_table";
         var id_charts = "charts0";
         var div_charts = "div_charts";
-        var aliases = {"id": "Id", "time": "Måletidspunkt", "temp": "Temperatur", "turb": "Turbiditet"};
+        var aliases = {"id": "Id", "time": "Måletidspunkt", "temp": "Temperatur", "turb": "Turbiditet", "ph": "PH"};
                 
         data0 = new Dataset(id_dataset, handler_url, spn_dataset);
         for (var key in aliases) {
@@ -19,6 +23,8 @@
         }
         table0 = new Table(id_table, div_table, data0);
         charts0 = new Charts(id_charts, div_charts, data0);
+
+        q = " <?php echo $query ?> ";
     }
 </script>
 <span id="spn_dataset"></span>

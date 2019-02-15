@@ -35,14 +35,14 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Uthenting av data fra database
 - [ ] Fjernstyring
   - [x] Mulighet til å legge inn downlink fra The Things Network gjennom nettsiden (Sovetid)
-  - [ ] Ikke implementert i Arduino
+  - [x] Implementert i Arduino
   - [ ] \(?\) Mulighet til å requeste ekstra måledata fra SSD
 - [ ] Design
   - [x] Et fungerende, overordnet, midlertidig design
   - [ ] Endelig navn og logo for gruppen
   - [ ] Skikkelig design for datamaskiner
   - [ ] Skikkelig design for mobil
-- [ ] Innlogging-system
+- [x] Innlogging-system
 - [ ] Varsling på E-mail
 - [ ] Informasjon om oss og vårt produkt (Noe annet enn Lorum Ipsum på forsiden)
 - [ ] .htaccess-fil

@@ -4,10 +4,10 @@
         $gotMsg = true;
         switch ($_GET["msg"]) {
             case 'incomplete':
-                $msg = "<p class='negative'>Noe gikk galt. Sjekk at skjemaet er riktig utfylt.</p>";
+                $msg = "<div class='negative'><p>Noe gikk galt. Sjekk at skjemaet er riktig utfylt.</p></div>";
                 break;
             case 'success':
-                $msg = "<p class='positive'>Downlink ble registrert.</p>";
+                $msg = "<div class='positive'><p>Downlink ble registrert.</p></div>";
                 break;
             default:
                 $msg = "";
@@ -30,28 +30,6 @@
     }
 
 </script>
-<style>
-    p.positive {
-        display: inline-block;
-	    background: hsl(120, 75%, 75%);
-		border: 2px solid hsl(120, 100%, 30%);
-		border-radius: 8px;
-		padding: 4px;
-		max-width: 300px;
-        text-align: center;
-        margin: auto;
-	}
-	p.negative {
-        display: inline-block;
-        background: hsl(348, 75%, 75%);
-		border: 2px solid hsl(348, 100%, 30%);
-		border-radius: 8px;
-		padding: 4px;
-        max-width: 300px;
-        text-align: center;
-        margin: auto;
-	}
-</style>
 <form action="Includes/downlink-h.php" method="POST" name="dwnlnk" id="dwnlnk" style="text-align: center;">
     <p style="line-height: 25px;">
         Sleep time: 

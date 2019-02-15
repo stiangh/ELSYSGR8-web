@@ -10,6 +10,11 @@ function compareArrays(ar1, ar2) { // Funksjonen sjekker om to arrayer er like. 
 	return true;
 }
 
+function trimOnBlur(ev) {
+	let t = ev.currentTarget;
+	t.value = t.value.trim();
+}
+
 function r2c(rData, header) {
 	var cData = [];
 		for (var i = 0; i < rData.length; i++) {
@@ -279,7 +284,8 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 				var h = obj.headers[i];
 				obj.headerBools[h] = true;
 				var s = document.createElement("span");
-				s.innerHTML = (h in obj.aliases ? obj.aliases[h] : h);
+				if (i != 0) {s.innerHTML = " | ";}
+				s.innerHTML += (h in obj.aliases ? obj.aliases[h] : h);
 				var cb = document.createElement("input");
 				cb.type = "checkbox";
 				cb.checked = true;

@@ -86,7 +86,7 @@ body {
 	margin: auto;
 	text-align: center;
 }
-#loginbox input {
+#loginbox input, #loginbox button {
 	box-sizing: border-box;
 	margin: 1px;
 	width: 70%;
@@ -103,7 +103,7 @@ body {
 	text-align: center;
 }
 #footer {
-	height: 100px;
+	height: 150px;
 	background: var(--theme-c-1);
 	float: down;
 	position: relative;
@@ -129,9 +129,43 @@ body {
 	display: block;
 	text-align: center;
 }
-#spn_dataset input:not([type = "checkbox"]), #spn_dataset select, #spn_dataset button {
+input:not([type="checkbox"]), select, button {
 	box-sizing: border-box;
+}
+#spn_dataset input:not([type = "checkbox"]), #spn_dataset select, #spn_dataset button {
 	height: 25px;
 	width: 140px;
 	margin: 2px;
+}
+#signup {
+	text-align: center;
+}
+#signup input:not([type="checkbox"]), #signup select, #signup button {
+	width: 45%;
+	height: 30px;
+	margin-bottom: 10px;
+}
+div.positive, div.negative {
+	margin: auto;
+	text-align: center;
+}
+div.positive>p {
+	display: inline-block;
+	background: hsl(120, 75%, 75%);
+	border: 2px solid hsl(120, 100%, 30%);
+	border-radius: 8px;
+	padding: 4px;
+	max-width: 300px;
+	text-align: center;
+	margin: auto;
+}
+div.negative>p {
+	display: inline-block;
+	background: hsl(348, 75%, 75%);
+	border: 2px solid hsl(348, 100%, 30%);
+	border-radius: 8px;
+	padding: 4px;
+	max-width: 300px;
+	text-align: center;
+	margin: auto;
 }

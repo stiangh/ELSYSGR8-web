@@ -7,6 +7,12 @@
 		header('Location: ' . $redirect);
 		exit();
 	}
+
+	$loggedIn = false;
+	if (isset($_SESSION["user"])) {
+		$loggedIn = true;
+		$user = $_SESSION["user"];
+	}
 ?>
 <!DOCTYPE html>
 <html lang="no">
@@ -23,11 +29,10 @@
 					<h1 class="logo">AquaTech</h1>
 				</div>
 				<div id="loginbox">
-					<form>
-						<input type="text" name="email" placeholder="E-mail"><br>
-						<input type="password" name="pwd" placeholder="Passord"><br>
-						<input type="submit" name="submit" value="Logg inn">
-					</form>
+					<?php
+						if (!$loggedIn) {include "Content/login-form.php";}
+						else {include "Content/logged-in.php";}
+					?>
 				</div>
 			</div>
 			<div class="nav-bar">
@@ -46,7 +51,9 @@
 			?>
 			
 		</div>
-		<div id="footer">
+		<div id="footer" style="padding-top: 10px;">
+			<h2 style="color: white; text-align: center;">POWERED BY</h2>
+			<a style="display: block; font-size: 175%; color: white; font-variant: small-caps; text-align: center;" href="https://www.rittal.com" target="_blank">Rittal AS</a>
 		</div>
 	</body>
 </html>

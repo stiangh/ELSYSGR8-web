@@ -38,8 +38,14 @@
 			<div class="nav-bar">
 				<div class="nav-box"><a href="https://folk.ntnu.no/stiangh/AquaTech/">Forside</a></div>
 				<div class="nav-box"><a href="data.php">Data</a></div>
-				<div class="nav-box"><a href="downlink.php">Downlink</a></div>
-				<div class="nav-box"><a href="signup.php">Registrer</a></div>
+				<?php
+					if ($loggedIn) {
+						echo '<div class="nav-box"><a href="downlink.php">Downlink</a></div>';
+					}
+					else {
+						echo '<div class="nav-box"><a href="signup.php">Registrer</a></div>';
+					}
+				?>
 			</div>
 			<div class="placeholder"></div>
 		</div>

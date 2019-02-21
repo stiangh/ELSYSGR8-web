@@ -37,11 +37,16 @@ function dateValue(dt) {
 
 }
 
-function loadWithRequest(method, content, page_url) { // Laster en nettside med f.eks POST
+function loadWithRequest(method, content, page_url, newTab = false) { // Laster en nettside med f.eks POST
 	var f = document.createElement("form");
+	f.style.display = "none";
 	f.action = page_url;
 	f.method = method.toUpperCase();
-	f.style.display = "none";
+	f.name = "lwr_form";
+	f.id = "lwr_form";
+	if (newTab) {
+		f.target = "_blank";
+	}
 	for (var key in content) {
 		var input = document.createElement("input");
 		input.type = "text";
@@ -51,16 +56,21 @@ function loadWithRequest(method, content, page_url) { // Laster en nettside med 
 	}
 	document.body.appendChild(f);
 	f.submit();
+	if (newTab) {
+		document.body.removeChild(f);
+	}
 }
 
 class Dataset { // Klasse som innhenter data baser på bruker-input, og informerer Table, Charts om endringer
-	constructor(id, handler_url, spanbox_id) {
+	constructor(id, handler_url, spanbox_id, export_handler_url = false, spn_export_id = false) {
 		this.id = id;
 		this.handler = handler_url;
+		this.export_handler_url = export_handler_url;
 		this.AJAXInterval = null;
 		this.paused = false;
 		this.frequency = 5000; // ms
 		this.spanBox = document.getElementById(spanbox_id);
+		this.spn_export = ((spn_export_id == false) || (export_handler_url == false) ? false : document.getElementById(spn_export_id));
 		this.query = "";
 		this.method = "";
 		this.headers = [];
@@ -123,6 +133,14 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 
 		this.spnHeaders = document.createElement("p");
 		this.spanBox.appendChild(this.spnHeaders);
+
+		if (this.spn_export != false) {
+			this.btnExport = document.createElement("BUTTON");
+			this.btnExport.innerHTML = "Eksporter som CSV-fil";
+			this.btnExport.addEventListener('click', this.exportCSV.bind(null, this));
+			this.btnExport.id = this.id + "_btn_export";
+			this.spn_export.appendChild(this.btnExport);
+		}
 		
 		this.updateMethod(this);
 		this.updateQuery(this);
@@ -262,7 +280,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	
 	setFrequency(obj, frequency) {
 		console.log("setFrequency called");
-		// Not implemented yet, low priority
+		obj.frequency = frequency;
 		return;
 	}
 	
@@ -315,6 +333,25 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		var query = obj.query;
 		var url = window.location.origin + window.location.pathname;
 		loadWithRequest(method, {"query": query }, url);
+	}
+
+	exportCSV(obj) {
+		if (obj.export_handler_url == false) {
+			return;
+		}
+		let content = {};
+		content.auth = "mitsub";
+		content.json = JSON.stringify(obj.data);
+		
+		let ignore = [];
+		for (let key in obj.headerBools) {
+			if (obj.headerBools[key] === false) {
+				ignore.push(key);
+			}
+		}
+		content.ignore = JSON.stringify(ignore);
+
+		loadWithRequest("POST", content, "Includes/export-csv.php", false);
 	}
 }
 

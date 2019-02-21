@@ -39,4 +39,3 @@
             echo "Something went wrong.";
         }
     }
-?>

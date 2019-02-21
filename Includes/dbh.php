@@ -5,4 +5,3 @@
 	$dbName = "stiangh_inno19";
 	
 	$conn = mysqli_connect($dbServer, $dbUsername, $dbPwd, $dbName);
-?>

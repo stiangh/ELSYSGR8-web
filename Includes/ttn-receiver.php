@@ -37,5 +37,3 @@
 		$stmt->execute();
 		$stmt->close();
 	}
-	
-?>

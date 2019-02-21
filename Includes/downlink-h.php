@@ -27,4 +27,3 @@
 		
 		header("Location: ../downlink.php?msg=success&slpt=$slpt");
 	}
-?>

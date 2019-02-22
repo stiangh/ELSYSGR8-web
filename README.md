@@ -14,6 +14,10 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
 **Fremdrift:**
 
 - [x] Lage repository på GitHub!
+- [x] Lagring i database
+  - [x] Sette opp database
+  - [x] Automatisk lagring av målinger fra The Things Network
+  - [x] Uthenting av data fra database
 - [ ] Fremstilling av data i tabeller og grafer
   - [x] Tabeller og grafer implementert
   - [x] Dynamisk oppdatering av tabeller og grafer m/AJAX
@@ -23,17 +27,14 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Mulighet til å eksportere data som CSV-fil
   - [x] Mulighet til eksportere grafer som PNG-filer
   - [ ] Mulighet til å fargekode basert på måle-verdiene
-- [ ] Data
+- [ ] Måleparametere Implementert
   - [x] Temperatur
   - [x] Turbiditet
   - [x] Timestamp (Fra TTN-Gatewayen som først mottok pakken)
   - [x] PH
   - [ ] Konduktivitet
+  - [ ] Fargeanalyse
   - [ ] Batteri%
-- [x] Lagring i database
-  - [x] Sette opp database
-  - [x] Automatisk lagring av målinger fra The Things Network
-  - [x] Uthenting av data fra database
 - [ ] Fjernstyring
   - [x] Mulighet til å legge inn downlink fra The Things Network gjennom nettsiden (Sovetid)
   - [x] Implementert i Arduino

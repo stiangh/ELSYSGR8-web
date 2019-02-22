@@ -13,7 +13,7 @@
             $json_array = json_decode($json_string);
             $ignore = (isset($_POST["ignore"]) ? json_decode($_POST["ignore"]) : array());
 
-            $filename = uniqid().".csv";
+            $filename = "aq".uniqid().".csv";
             $file = fopen($filename, 'w');
 
             foreach ($json_array[0] as $key => $value) {

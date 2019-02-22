@@ -169,8 +169,7 @@ div.negative>p {
 	text-align: center;
 	margin: auto;
 }
-#spn_dataset_export {
-	display: table;
+.exportBtn {
+	display: block;
 	margin: 5px auto 5px auto;
-	text-align: center;
 }

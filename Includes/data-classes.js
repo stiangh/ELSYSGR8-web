@@ -133,14 +133,6 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 
 		this.spnHeaders = document.createElement("p");
 		this.spanBox.appendChild(this.spnHeaders);
-
-		if (this.spn_export != false) {
-			this.btnExport = document.createElement("BUTTON");
-			this.btnExport.innerHTML = "Eksporter som CSV-fil";
-			this.btnExport.addEventListener('click', this.exportCSV.bind(null, this));
-			this.btnExport.id = this.id + "_btn_export";
-			this.spn_export.appendChild(this.btnExport);
-		}
 		
 		this.updateMethod(this);
 		this.updateQuery(this);
@@ -361,6 +353,10 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		this.tableDiv = document.getElementById(tdiv_id);
 		this.dataSet = data_set;
 		this.dataSet.addListener(this.dataSet, this);
+		this.exportBtn = document.createElement("BUTTON");
+		this.exportBtn.innerHTML = "Eksporter som CSV-fil";
+		this.exportBtn.addEventListener('click', this.dataSet.exportCSV.bind(null, this.dataSet));
+		this.exportBtn.className = "exportBtn";
 		
 		return;
 	}
@@ -408,6 +404,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		}
 		obj.tableDiv.innerHTML = "";
 		obj.tableDiv.appendChild(table);
+		obj.tableDiv.appendChild(obj.exportBtn);
 		
 		return;
 	}
@@ -489,6 +486,12 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			}
 		});
 
+		obj.charts[header].exportBtn = document.createElement("BUTTON");
+		obj.charts[header].exportBtn.innerHTML = "Eksporter som bilde";
+		obj.charts[header].exportBtn.addEventListener('click', obj.exportPNG.bind(null, obj, header));
+		obj.charts[header].exportBtn.className = "exportBtn";
+		obj.div.appendChild(obj.charts[header].exportBtn);
+
 		return;
 	}
 
@@ -508,5 +511,13 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		}
 
 		return;
+	}
+
+	exportPNG(obj, header) {
+		let cvs = obj.charts[header].canvas;
+		let content = {"auth": "mitsub"};
+		content.img = cvs.toDataURL("image/png");
+
+		loadWithRequest("POST", content, "Includes/save-canvas.php", false);
 	}
 }

@@ -21,8 +21,8 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Mulighet til velge hvilke parametre som vises i tabeller og grafer
   - [x] Aliaser \(F.eks \"Temperatur\" istendenfor \"temp\"\)
   - [x] Mulighet til å eksportere data som CSV-fil
+  - [x] Mulighet til eksportere grafer som PNG-filer
   - [ ] Mulighet til å fargekode basert på måle-verdiene
-  - [ ] Mulighet til eksportere grafer som PNG-filer
 - [ ] Data
   - [x] Temperatur
   - [x] Turbiditet

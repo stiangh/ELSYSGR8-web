@@ -37,6 +37,7 @@
             header("Content-Type: application/octet-stream"); 
             header('Content-Disposition: attachment; filename="'.basename($filename).'"');
             header('Content-Length: ' . filesize($filename));
+            header('Cache-Control: must-revalidate');
             ob_clean();
             flush();
             readfile($filename);

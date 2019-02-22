@@ -506,7 +506,8 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			var chart = obj.charts[header];
 			chart.data.datasets[0].data = r2c(rData, header);
 			chart.data.datasets[0].label = (header in aliases ? aliases[header] : header);
-			document.getElementById(obj.id + "_cvs_" + header).style.display = (headerBools[header] ? "initial" : "none");
+			chart.canvas.style.display = (headerBools[header] ? "initial" : "none");
+			chart.exportBtn.style.display = (headerBools[header] ? "block" : "none");
 			chart.update();
 		}
 

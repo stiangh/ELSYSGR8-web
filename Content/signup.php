@@ -9,7 +9,11 @@
             x.addEventListener('invalid', function() {this.style.borderColor = "red"; if (this.dataset.hasOwnProperty('ermsg')) {this.setCustomValidity(this.dataset.ermsg)}});
             x.addEventListener('input', function() {this.style.borderColor = "initial"; this.setCustomValidity('');});
         }
-        form.pwd.addEventListener('input', function() {form.pwd2.pattern = this.value;});
+        form.pwd.addEventListener('input', function() {form.pwd2.pattern = escapeRegExp(this.value);});
+    }
+
+    function escapeRegExp(text) {
+        return text.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, '\\$&');
     }
 </script>
 <h1>Registrer Bruker</h1>

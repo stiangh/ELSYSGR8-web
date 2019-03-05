@@ -18,7 +18,7 @@
                 $db_pwd = $row["pwd"];
                 if (password_verify($pwd, $db_pwd)) {
                     // LOGIN
-                    $user = array("email"=>$row["email"], "fname"=>$row["fname"], "sname"=>$row["sname"]);
+                    $user = array("uid"=>$row["id"], "email"=>$row["email"], "fname"=>$row["fname"], "sname"=>$row["sname"]);
                     $_SESSION["user"] = $user;
                     header("Location: ../index.php");
                     // LOGIN

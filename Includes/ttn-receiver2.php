@@ -21,8 +21,7 @@
 		$mi = $time[1];
 		$se = substr($time[2], 0, 2);
 		$timestampraw = "$yyyy-$mm-$dd $hh:$mi:$se";
-		$dateraw = strtotime("+1 hour", strtotime($timestampraw));
-		$phpdate = date("Y-m-d H:i:s", $dateraw);
+		$phpdate = date("Y-m-d H:i:s", strtotime("+1 hour", strtotime($timestampraw)));
 		
 		// Prepare statements for MySQL-database
 		// The name of the table, the structure and the variables will need to change when we implement more parameters
@@ -30,16 +29,9 @@
 		$stmt->bind_param('sddd', $p_time, $p_temp, $p_turb, $p_ph);
 		
 		$p_time = $phpdate;
-		if (isset($json_array['payload_fields']['data'])) {
-			$p_temp = $json_array['payload_fields']['data'][0]['value'];
-			$p_turb = $json_array['payload_fields']['data'][1]['value'];
-			$p_ph = $json_array['payload_fields']['data'][2]['value'];
-		}
-		else {
-			$p_temp = $json_array['payload_fields']['temp'];
-			$p_turb = $json_array['payload_fields']['turb'];
-			$p_ph = $json_array['payload_fields']['ph'];
-		}
+		$p_temp = $json_array['payload_fields']['temp'];
+		$p_turb = $json_array['payload_fields']['turb'];
+		$p_ph = $json_array['payload_fields']['ph'];
 		
 		// Send and close
 		$stmt->execute();

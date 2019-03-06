@@ -41,6 +41,7 @@
 				<?php
 					if ($loggedIn) {
 						echo '<div class="nav-box"><a href="downlink.php">Downlink</a></div>';
+						echo '<div class="nav-box"><a href="mypage.php">Min Side</a></div>';
 					}
 					else {
 						echo '<div class="nav-box"><a href="signup.php">Registrer</a></div>';

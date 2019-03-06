@@ -44,4 +44,19 @@
 		// Send and close
 		$stmt->execute();
 		$stmt->close();
+
+		$content_ar = array("time" => $phpdate, "temp" => $p_temp, "turb" => $p_turb, "ph" => $p_ph);
+		$content = json_encode($content_ar);
+
+		$ch = curl_init("https://folk.ntnu.no/stiangh/AquaTech/Includes/alert-h.php");
+		
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+		
+		$res = curl_exec($ch);
+
+		curl_close($ch);
 	}
+
+	exit;

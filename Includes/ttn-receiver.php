@@ -26,7 +26,7 @@
 		
 		// Prepare statements for MySQL-database
 		// The name of the table, the structure and the variables will need to change when we implement more parameters
-		$stmt = $conn->prepare("INSERT INTO phtest (time, temp, turb, ph) VALUES (?, ?, ?, ?)");
+		$stmt = $conn->prepare("INSERT INTO $dbSamples (time, temp, turb, ph) VALUES (?, ?, ?, ?)");
 		$stmt->bind_param('sddd', $p_time, $p_temp, $p_turb, $p_ph);
 		
 		$p_time = $phpdate;

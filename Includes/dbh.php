@@ -5,3 +5,7 @@
 	$dbName = "stiangh_inno19";
 	
 	$conn = mysqli_connect($dbServer, $dbUsername, $dbPwd, $dbName);
+
+	$dbSamples = "phtest";
+	$dbAlert = "alert_limits";
+	$dbUsers = "signup_test";

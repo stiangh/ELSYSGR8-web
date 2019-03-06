@@ -6,7 +6,7 @@
 
     if ($loggedIn = isset($_SESSION["user"])) {
         $email = mysqli_real_escape_string($conn, $_SESSION["user"]["email"]);
-        $sql = "SELECT * FROM alert_limits WHERE email='$email'";
+        $sql = "SELECT * FROM $dbAlert WHERE email='$email'";
         $res = mysqli_query($conn, $sql);
 
         if (($nrows = mysqli_num_rows($res)) < 1) {

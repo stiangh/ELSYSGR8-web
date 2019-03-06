@@ -19,12 +19,12 @@
         
         // check if user already has row
         $uid = mysqli_real_escape_string($conn, $_SESSION["user"]["uid"]);
-        $sql_c = "SELECT * FROM alert_limits WHERE uid=$uid";
+        $sql_c = "SELECT * FROM $dbAlert WHERE uid=$uid";
         $res_c = mysqli_query($conn, $sql_c);
         
         if (mysqli_num_rows($res_c) < 1) {
             // Create new row
-            $stmt = $conn->prepare("INSERT INTO alert_limits (uid, email, temp_lower, temp_upper, temp_nbt, turb_lower, turb_upper, turb_nbt, ph_lower, ph_upper, ph_nbt, conc_lower, conc_upper, conc_nbt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO $dbAlert (uid, email, temp_lower, temp_upper, temp_nbt, turb_lower, turb_upper, turb_nbt, ph_lower, ph_upper, ph_nbt, conc_lower, conc_upper, conc_nbt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param('isddsddsddsdds', $id, $email, $temp_lower, $temp_upper, $temp_nbt, $turb_lower, $turb_upper, $turb_nbt, $ph_lower, $ph_upper, $ph_nbt, $conc_lower, $conc_upper, $conc_nbt);
             
             $id = $uid;
@@ -47,7 +47,7 @@
         }
         else {
             // Update existing row
-            $stmt = $conn->prepare("UPDATE alert_limits SET temp_lower=?, temp_upper=?, temp_nbt=?, turb_lower=?, turb_upper=?, turb_nbt=?, ph_lower=?, ph_upper=?, ph_nbt=?, conc_lower=?, conc_upper=?, conc_nbt=? WHERE uid=?");
+            $stmt = $conn->prepare("UPDATE $dbAlert SET temp_lower=?, temp_upper=?, temp_nbt=?, turb_lower=?, turb_upper=?, turb_nbt=?, ph_lower=?, ph_upper=?, ph_nbt=?, conc_lower=?, conc_upper=?, conc_nbt=? WHERE uid=?");
             $stmt->bind_param('ddsddsddsddsi', $temp_lower, $temp_upper, $temp_nbt, $turb_lower, $turb_upper, $turb_nbt, $ph_lower, $ph_upper, $ph_nbt, $conc_lower, $conc_upper, $conc_nbt, $id);
 
             $id = $uid;

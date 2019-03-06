@@ -1,5 +1,5 @@
 <?php
-	include_once "dbh.php";
+	include "dbh.php";
 	
 	if (!isset($_POST["metode"])) {
 		echo "Error: Method not set";
@@ -8,7 +8,6 @@
 	else {
 		date_default_timezone_set("Europe/Oslo");
 		$jsonArray = array("error"=>false, "message"=>"", "data"=>array());
-		$dbTableName = "phtest";
 		switch ($_POST["metode"]) {
 			case "lxs":
 				{
@@ -19,7 +18,7 @@
 					else {
 						$lxs = mysqli_real_escape_string($conn, $_POST["lxs"]);
 						
-						$sql = "SELECT * FROM $dbTableName ORDER BY id DESC LIMIT $lxs"; // Tester data_temp_turb
+						$sql = "SELECT * FROM $dbSamples ORDER BY id DESC LIMIT $lxs"; // Tester data_temp_turb
 						$res = mysqli_query($conn, $sql);
 						
 						while ($row = mysqli_fetch_assoc($res)) {
@@ -42,7 +41,7 @@
 						$phpdate = strtotime("-$lxd days");
 						$datestring = date('Y-m-d', $phpdate) . " 00:00:00";
 
-						$sql = "SELECT * FROM $dbTableName WHERE time >= '$datestring' ORDER BY id DESC";
+						$sql = "SELECT * FROM $dbSamples WHERE time >= '$datestring' ORDER BY id DESC";
 						$res = mysqli_query($conn, $sql);
 
 						while ($row = mysqli_fetch_assoc($res)) {
@@ -68,7 +67,7 @@
 						$fstring = date('Y-m-d', $fd)." 00:00:00";
 						$tstring = date('Y-m-d', $td)." 23:59:59";
 
-						$sql = "SELECT * FROM $dbTableName WHERE time BETWEEN '$fstring' AND '$tstring' ORDER BY id DESC";
+						$sql = "SELECT * FROM $dbSamples WHERE time BETWEEN '$fstring' AND '$tstring' ORDER BY id DESC";
 						$res = mysqli_query($conn, $sql);
 
 						while ($row = mysqli_fetch_assoc($res)) {

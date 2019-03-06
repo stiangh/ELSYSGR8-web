@@ -1,6 +1,6 @@
 <?php
     include_once "dbh.php";
-    $dbTableName = "signup_test";
+    
     $params = ["email", "pwd", "pwd2", "fname", "sname"];
     $success = 0;
     $msg = "";
@@ -59,7 +59,7 @@
                 $sname = $_POST["sname"];
 
                 $t_email = mysqli_real_escape_string($conn, $email);
-                $sql = "SELECT * FROM $dbTableName WHERE email='$t_email'";
+                $sql = "SELECT * FROM $dbUsers WHERE email='$t_email'";
                 $res = mysqli_query($conn, $sql);
 
                 if (mysqli_num_rows($res) != 0) {
@@ -68,7 +68,7 @@
                     die();
                 }
                 else {
-                    $stmt = $conn->prepare("INSERT INTO $dbTableName (email, pwd, fname, sname) VALUES (?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO $dbUsers (email, pwd, fname, sname) VALUES (?, ?, ?, ?)");
                     $stmt->bind_param('ssss', $p_email, $p_pwd, $p_fname, $p_sname);
 
                     $p_email = $email;

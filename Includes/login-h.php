@@ -1,8 +1,6 @@
 <?php
     session_start();
-    include_once "dbh.php";
-
-    $dbTableName = "signup_test";
+    include "dbh.php";
 
     if (!(isset($_POST["submit"]) && ($_POST["submit"] == "mitsub"))) {
         echo "Not successful.";
@@ -10,7 +8,7 @@
         $email = mysqli_real_escape_string($conn, $_POST["email"]);
         $pwd = $_POST["pwd"];
 
-        $sql = "SELECT * FROM $dbTableName WHERE email = '$email'";
+        $sql = "SELECT * FROM $dbUsers WHERE email = '$email'";
         $res = mysqli_query($conn, $sql);
         if (mysqli_num_rows($res) == 1) {
             $row = mysqli_fetch_assoc($res);

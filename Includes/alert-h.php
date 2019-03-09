@@ -22,6 +22,10 @@
     $res = mysqli_query($conn, $sql);
 
     while ($row = mysqli_fetch_assoc($res)) {
+        $flag = ($row["flag"] == NULL ? "1970-01-01 00:00:00" : $row["flag"]);
+        if (strtotime($flag) >= strtotime("-30 minutes")) {
+            continue;
+        }
         $bTemp = (($row["temp_nbt"] == 'false') && ($row["temp_lower"] <= $temp) && ($row["temp_upper"] >= $temp)) || (($row["temp_nbt"] == 'true') && (($row["temp_lower"] >= $temp) || ($row["temp_upper"] <= $temp)));
         $bTurb = (($row["turb_nbt"] == 'false') && ($row["turb_lower"] <= $turb) && ($row["turb_upper"] >= $turb)) || (($row["turb_nbt"] == 'true') && (($row["turb_lower"] >= $turb) || ($row["turb_upper"] <= $turb)));
         $bPh = (($row["ph_nbt"] == 'false') && ($row["ph_lower"] <= $ph) && ($row["ph_upper"] >= $ph)) || (($row["ph_nbt"] == 'true') && (($row["ph_lower"] >= $ph) || ($row["ph_upper"] <= $ph)));
@@ -40,6 +44,15 @@
             $headers .= "From: AquaTech <AquaTech>";
 
             mail($to, $subject, $msg, $headers);
+
+            $stamp = Date("Y-m-d H:i:s");
+            $sql2 = "UPDATE $dbAlert SET flag = (?) WHERE email = (?)";
+            $stmt = $conn->prepare($sql2);
+            $stmt->bind_param("ss", $p_flag, $p_mail);
+            $p_flag = $stamp;
+            $p_mail = $to;
+            $stmt->execute();
+            $stmt->close();
         }
     }
 

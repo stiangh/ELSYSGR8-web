@@ -45,7 +45,7 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [ ] Skikkelig design for datamaskiner
   - [ ] Skikkelig design for mobil
 - [x] Innlogging-system
-- [ ] Varsling på E-mail
+- [x] Varsling på E-mail
 - [ ] Informasjon om oss og vårt produkt (Noe annet enn Lorum Ipsum på forsiden)
 - [ ] .htaccess-fil
 - [ ] \(?\) Mulighet til å bruke egne algoritmer på data, kombinere data etc.

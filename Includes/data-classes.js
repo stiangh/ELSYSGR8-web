@@ -418,6 +418,10 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		this.dataset.addListener(this.dataset, this);
 		this.headers = [];
 		this.charts = {}; // "header/key": chart.js;
+		this.options = {
+			"sMin": {"temp": 0, "turb": 0, "ph": 0, "conc": 0}, 
+			"sMax": {"temp": 30, "turb": 1, "ph": 14, "conc": 1}
+		}
 	}
 
 	getNotification(obj, newHeaders) {
@@ -481,10 +485,21 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 					xAxes: [{
 						type: 'time',
 						distribution: 'linear'
+					}],
+					yAxes: [{
+						type: 'linear'
 					}]
 				}
 			}
 		});
+
+		if (header in obj.options["sMin"]) {
+			obj.charts[header].options.scales.yAxes[0].ticks.suggestedMin = parseFloat(obj.options["sMin"][header]);
+		}
+		if (header in obj.options["sMax"]) {
+			obj.charts[header].options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
+		}
+		obj.charts[header].update();
 
 		obj.charts[header].exportBtn = document.createElement("BUTTON");
 		obj.charts[header].exportBtn.innerHTML = "Eksporter som bilde";
@@ -508,6 +523,12 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			chart.data.datasets[0].label = (header in aliases ? aliases[header] : header);
 			chart.canvas.style.display = (headerBools[header] ? "initial" : "none");
 			chart.exportBtn.style.display = (headerBools[header] ? "block" : "none");
+			if (header in obj.options["sMin"]) {
+				chart.options.scales.yAxes[0].ticks.suggestedMin = parseFloat(obj.options["sMin"][header]);
+			}
+			if (header in obj.options["sMax"]) {
+				chart.options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
+			}
 			chart.update();
 		}
 

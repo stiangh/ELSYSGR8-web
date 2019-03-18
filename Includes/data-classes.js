@@ -75,6 +75,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.method = "";
 		this.headers = [];
 		this.headerBools = {};
+		this.headerCbs = {};
 		this.data = [];
 		this.listeners = [];
 		this.aliases = {};
@@ -133,6 +134,12 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 
 		this.spnHeaders = document.createElement("p");
 		this.spanBox.appendChild(this.spnHeaders);
+
+		this.slcAll = document.createElement("SPAN");
+		this.slcAll.innerHTML = "(Deselect All)";
+		this.slcAll.style.textDecoration = "underline";
+		this.slcAll.onclick = this.selectAll.bind(null, this, true);
+		this.slcAll.style.cursor = "pointer";
 		
 		this.updateMethod(this);
 		this.updateQuery(this);
@@ -290,7 +297,8 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 			newHeaders = true;
 			obj.headerBools = {};
 			obj.spnHeaders.innerHTML = "";
-			for (var i = 0; i < obj.headers.length; i++) {
+			obj.headerCbs = {};
+			for (var i = 0; i < obj.headers.length; i++) { // Legge til checkboxes headers
 				var h = obj.headers[i];
 				obj.headerBools[h] = true;
 				var s = document.createElement("span");
@@ -301,9 +309,11 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 				cb.checked = true;
 				cb.id = obj.id + "_chk" + h;
 				cb.addEventListener('change', obj.setHeaderBools.bind(null, obj, h));
+				obj.headerCbs[h] = cb;
 				obj.spnHeaders.appendChild(s);
 				obj.spnHeaders.appendChild(cb);
 			}
+			obj.spnHeaders.appendChild(obj.slcAll);
 		}
 		obj.notifyListeners(obj, newHeaders)
 		
@@ -311,8 +321,38 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 
 	setHeaderBools(obj, header) {
+		console.log("setHeaderBools called.");
 		obj.headerBools[header] = !obj.headerBools[header];
 		obj.notifyListeners(obj, false);
+		obj.updateSelectAll(obj);
+	}
+
+	selectAll(obj, bDe) {
+		let b = !bDe;
+		for (let key in obj.headerBools) {
+			console.log(key);
+			obj.headerBools[key] = b;
+			obj.headerCbs[key].checked = b;
+		}
+		obj.updateSelectAll(obj);
+		obj.notifyListeners(obj, false);
+	}
+
+	updateSelectAll(obj) {
+		let b = false;
+		for (let header in obj.headerBools) {
+			if (obj.headerBools[header] == false) {
+				b = true;
+			}
+		}
+		if (b) {
+			obj.slcAll.innerHTML = "(Select All)";
+			obj.slcAll.onclick = obj.selectAll.bind(null, obj, false);
+		} 
+		else {
+			obj.slcAll.innerHTML = "(Deselect All)";
+			obj.slcAll.onclick = obj.selectAll.bind(null, obj, true);
+		}
 	}
 
 	setAlias(obj, header, alias) {
@@ -324,7 +364,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		var method = "POST";
 		var query = obj.query;
 		var url = window.location.origin + window.location.pathname;
-		loadWithRequest(method, {"query": query }, url);
+		loadWithRequest(method, {"query": query }, url); // Ikke implementert
 	}
 
 	exportCSV(obj) {

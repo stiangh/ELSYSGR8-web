@@ -2,8 +2,6 @@
     $query = (isset($_POST["query"]) ? $_POST["query"] : "No predefined query");
     //echo $query;
 ?>
-<script src="Includes\Chart.bundle.min.js"></script>
-<script src="Includes\data-classes.js"></script>
 <script>
 	window.onload = oppstart;
 			

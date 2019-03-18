@@ -9,3 +9,4 @@
 	$dbSamples = "phtest";
 	$dbAlert = "alert_limits";
 	$dbUsers = "signup_test";
+	$dbRules = "rules_test";

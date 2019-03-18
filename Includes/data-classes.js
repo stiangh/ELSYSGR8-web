@@ -303,7 +303,8 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 				obj.headerBools[h] = true;
 				var s = document.createElement("span");
 				if (i != 0) {s.innerHTML = " | ";}
-				s.innerHTML += (h in obj.aliases ? obj.aliases[h] : h);
+				// s.innerHTML += (h in obj.aliases ? obj.aliases[h] : h);
+				s.insertAdjacentHTML('beforeend', (h in obj.aliases ? obj.aliases[h] : h));
 				var cb = document.createElement("input");
 				cb.type = "checkbox";
 				cb.checked = true;
@@ -581,5 +582,444 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		content.img = cvs.toDataURL("image/png");
 
 		loadWithRequest("POST", content, "Includes/save-canvas.php", false);
+	}
+}
+
+class Rule {
+	constructor(bJson, json, param, type, v1, v2, color, doColorCode, doAlert) {
+		this.html = false;
+		this.ALLOWED_PARAMS = {"temp": "Temperatur", "turb": "Turbiditet", "ph": "PH", "conc": "Konduktivitet"};
+		this.ALLOWED_TYPES = {"ab": "over", "be": "under", "bt": "mellom", "nbt": "ikke mellom"};
+		if (bJson) {
+			this.JSON_modify(json);
+		}
+		else {
+			this.modify(param, type, v1, v2, color, doColorCode, doAlert);
+		}
+	}
+
+	modify(param, type, v1, v2, color, doColorCode, doAlert) {
+		this.param = ((typeof param == undefined) || (param == "") || (param == null) ? "temp" : param);
+		this.type = ((typeof type == undefined) || (type == "") || (type == null) ? "ab" : type);
+		this.v1 = ((typeof v1 == undefined) || isNaN(v1) ? "" : parseFloat(v1));
+		this.v2 = ((typeof v2 == undefined) || isNaN(v2) ? "" : parseFloat(v2));
+		this.color = ((typeof color == undefined) || (color == "") || (color == null) ? "#ff0000" : color);
+		this.doColorCode = ((typeof doColorCode == undefined) || (doColorCode == "") || (doColorCode == null) ? false : doColorCode);
+		this.doAlert = ((typeof doAlert == undefined) || (doAlert == "") || (doAlert == null) ? false : doAlert);
+
+		if (["bt", "nbt"].includes(this.type)) {
+			console.log("minmax");
+			let min = Math.min(this.v1, this.v2);
+			let max = Math.max(this.v1, this.v2);
+			this.v1 = min;
+			this.v2 = max;
+		}
+
+		this.HTML_update();
+	}
+
+	JSON_modify(json) {
+		let j = JSON.parse(json);
+		this.modify(j.param, j.type, j.v1, j.v2, j.color, j.doColorCode, j.doAlert);
+	}
+	
+	HTML_modify() {
+		if (this.html == false) {
+			console.log("No html to modify from.");
+			return;
+		}
+		let param = this.slcParam.value;
+		let type = this.slcType.value;
+		let v1 = parseFloat(this.slcV1.value);
+		let v2 = parseFloat(this.slcV2.value);
+		let color = this.slcColor.value;
+		let doColorCode = this.slcDoColorCode.checked;
+		let doAlert = this.slcAlert.checked;
+		this.modify(param, type, v1, v2, color, doColorCode, doAlert);
+		return;
+	}
+	
+	HTML_create() {
+		if (this.html != false) {
+			return this.HTML_update();
+		}
+		this.html = document.createElement("DIV");
+		this.html.className = "rule-div";
+		let p = document.createElement("P");
+
+		p.innerHTML = "Når ";
+
+		this.slcParam = document.createElement("SELECT");
+		for (let key in this.ALLOWED_PARAMS) {
+			let op = document.createElement("OPTION");
+			op.value = key;
+			op.innerHTML = this.ALLOWED_PARAMS[key];
+			this.slcParam.appendChild(op);
+		}
+		this.slcParam.value = this.param;
+		p.appendChild(this.slcParam);
+
+		p.insertAdjacentHTML('beforeend', " er ");
+		
+		this.slcType = document.createElement("SELECT");
+		for (let key in this.ALLOWED_TYPES) {
+			let op = document.createElement("OPTION");
+			op.value = key;
+			op.innerHTML = this.ALLOWED_TYPES[key];
+			this.slcType.appendChild(op);
+		}
+		this.slcType.value = this.type;
+		p.appendChild(this.slcType);
+
+		p.insertAdjacentHTML('beforeend', ' ');
+
+		this.slcV1 = document.createElement("INPUT");
+		this.slcV1.type = "number";
+		this.slcV1.value = this.v1;
+		p.appendChild(this.slcV1);
+
+		this.spnV2 = document.createElement("SPAN");
+		this.spnV2.innerHTML = " og ";
+		this.slcV2 = document.createElement("INPUT");
+		this.slcV2.type = "number";
+		this.slcV2.value = (isNaN(this.v2) ? "" : parseFloat(this.v2));
+		this.spnV2.appendChild(this.slcV2);
+		p.appendChild(this.spnV2);
+
+		this.html.appendChild(p);
+		p = document.createElement("P");
+
+		p.innerHTML = "&rarr; Benytt fargekoding ";
+
+		this.slcDoColorCode = document.createElement("INPUT");
+		this.slcDoColorCode.type = "checkbox";
+		this.slcDoColorCode.checked = this.doColorCode;
+		p.appendChild(this.slcDoColorCode);
+
+		this.spnColor = document.createElement("SPAN");
+		this.spnColor.innerHTML = " Velg Farge: ";
+		this.slcColor = document.createElement("INPUT");
+		this.slcColor.type = "color";
+		this.slcColor.value = this.color;
+		this.spnColor.appendChild(this.slcColor);
+		p.appendChild(this.spnColor);
+
+		this.html.appendChild(p);
+		p = document.createElement("P");
+
+		p.innerHTML = "&rarr; Varsling på E-mail "
+
+		this.slcAlert = document.createElement("INPUT");
+		this.slcAlert.type = "checkbox";
+		this.slcAlert.value = this.doAlert;
+		p.appendChild(this.slcAlert);
+
+		this.html.appendChild(p);
+		this.HTML_showVs();
+		this.html.addEventListener('change', this.HTML_onchange.bind(null, this));
+		return this.html;
+	}
+
+	HTML_onchange(obj) {
+		obj.HTML_modify();
+	}
+
+	HTML_update() {
+		if (this.html == false) {
+			return;
+		}
+		this.slcParam.value = this.param;
+		this.slcType.value = this.type;
+		this.slcV1.value = this.v1;
+		this.slcV2.value = this.v2;
+		this.slcColor.value = this.color;
+		this.slcDoColorCode.checked = this.doColorCode;
+		this.slcAlert.checked = this.doAlert;
+
+		this.HTML_showVs();
+		return this.html;
+	}
+
+	HTML_showVs() {
+		if (this.html == false) {
+			return;
+		}
+		switch (this.slcType.value) {
+			case "ab":
+			case "be":
+				this.spnV2.style.display = "none";
+				break;
+			case "bt":
+			case "nbt":
+				this.spnV2.style.display = "initial";
+				break;
+			default:
+				console.log("Invalid rule type.")
+				break;
+		}
+		this.spnColor.style.display = (this.slcDoColorCode.checked ? "initial" : "none");
+		return;
+	}
+	
+	verify() {
+		if (!(this.param in ["temp", "turb", "ph", "conc"])) {
+			return false;
+		}
+		if (!(this.type in ["ab", "be", "bt", "nbt"])) {
+			return false;
+		}
+		if (isNaN(this.v1)) {
+			return false;
+		}
+		if ((this.type in ["bt", "nbt"]) && ((isNaN(this.v2)) || (this.v2 < this.v1))) {
+			return false;
+		}
+		return true;
+	}
+		
+
+	testValue(value) {
+		switch(this.type) {
+			case "ab":
+				if (parseFloat(value) > parseFloat(this.v1)) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			case "be":
+				if (parseFloat(value) < parseFloat(this.v1)) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			case "bt":
+				if ((parseFloat(value) >= parseFloat(this.v1)) && (parseFloat(value) <= parseFloat(this.v2))) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			case "nbt":
+				if (!(parseFloat(value) >= parseFloat(this.v1)) && (parseFloat(value) <= parseFloat(this.v2))) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			default:
+				console.log("Invalid rule type.");
+				return false;
+		}
+	}
+
+	stringify() {
+		this.HTML_modify();
+		let j = {};
+		j.param = this.param;
+		j.type = this.type;
+		j.v1 = this.v1;
+		j.v2 = this.v2;
+		j.color = this.color;
+		j.doColorCode = this.doColorCode;
+		j.doAlert = this.doAlert;
+		return JSON.stringify(j);
+	}
+}
+
+class User {
+	constructor(handler_url, save_url) {
+		this.handler_url = handler_url;
+		this.save_url = save_url;
+		this.html = false;
+		this.logged_in = false;
+		this.uid;
+		this.email;
+		this.fname;
+		this.sname;
+		this.rules = [];
+		this.requestUserInfo(this);
+	}
+
+	requestUserInfo(obj) {
+		let xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				let rt = xhttp.responseText;
+				let jsonArray = JSON.parse(rt);
+				if (jsonArray.er != "false") {
+					console.log("AJAX Request failed");
+					console.log(jsonArray.er);
+				}
+				else {
+					let ui = JSON.parse(jsonArray["json"]);
+					obj.uid = ui["uid"];
+					obj.email = ui["email"];
+					obj.fname = ui["fname"];
+					obj.sname = ui["sname"];
+
+					if (jsonArray["bRules"] == "true") {
+						obj.jsonUI = ui;
+	
+						let jr = JSON.parse(ui["rules"])["r"];
+						for (let i = 0; i < jr.length; i++) {
+							obj.rules.push(new Rule(true, jr[i]));
+						}
+					}
+
+					if (obj.rules.length == 0) {
+						obj.rules.push( new Rule(false) );
+					}
+
+					obj.logged_in = true;
+
+					if (obj.html != false) {
+						obj.HTML_create();
+					}
+				}
+				return;
+			}
+		}
+		xhttp.open("POST", this.handler_url, true);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send();
+		return;
+	}
+
+	HTML_create() {
+		if (!this.logged_in) {
+			this.html = document.createElement("DIV");
+			return this.html;
+		}
+		if (this.html != false) {
+			this.html.innerHTML = "";
+		}
+		else {
+			this.html = document.createElement("DIV");
+		}
+
+		for (let i = 0; i < this.rules.length; i++) {
+			let d = document.createElement("DIV");
+			/* d.insertAdjacentHTML("beforeend", "&uarr;");
+			d.insertAdjacentHTML("beforeend", "X");
+			d.insertAdjacentHTML("beforeend", "&darr;"); */
+
+			if (i != 0) {
+				let ub = document.createElement("BUTTON");
+				ub.innerHTML = "&uarr;";
+				ub.addEventListener('click', this.btn_moveRule.bind(null, this, i, "up"));
+				d.appendChild(ub);
+			}
+
+			let delb = document.createElement("BUTTON");
+			delb.innerHTML = "X";
+			delb.addEventListener('click', this.btn_delRule.bind(null, this, i));
+			d.appendChild(delb);
+
+			if (i != this.rules.length - 1) {
+				let db = document.createElement("BUTTON");
+				db.innerHTML = "&darr;";
+				db.addEventListener('click', this.btn_moveRule.bind(null, this, i, "down"));
+				d.append(db);
+			}
+
+			let rd = this.rules[i].HTML_create();
+			rd.style.display = "inline-block";
+			d.appendChild(rd);
+			this.html.appendChild(d);
+		}
+
+		this.btnAddRule = document.createElement("BUTTON");
+		this.btnAddRule.innerHTML = "Ny Regel";
+		this.btnAddRule.addEventListener('click', this.btn_addRule.bind(null, this));
+		this.html.appendChild(this.btnAddRule);
+
+		this.btnSaveRules = document.createElement("BUTTON");
+		this.btnSaveRules.innerHTML = "Lagre regler";
+		this.btnSaveRules.addEventListener('click', this.btn_saveRules.bind(null, this));
+		this.html.appendChild(this.btnSaveRules);
+		
+		return this.html;
+	}
+
+	addRule() {
+		this.rules.push( new Rule(false) );
+		this.HTML_create();
+	}
+
+	delRule(index) {
+		if (!Number.isInteger(index) || (index < 0) || (index >= this.rules.length)) {
+			console.log("Index out of bounds.");
+			return;
+		}
+		this.rules.splice(index, 1);
+		this.HTML_create();
+	}
+
+	moveRule(index, dir) {
+		if (!Number.isInteger(index) || (index < 0) || (index >= this.rules.length)) {
+			console.log("Index out of bounds.");
+			return;
+		}
+		if (dir == "up") {
+			if (index < 1) {
+				console.log("Index out of bounds.");
+				return;
+			}
+			let temp = this.rules.splice(index, 1)[0];
+			this.rules.splice(index - 1, 0, temp);
+		}
+		else if (dir == "down") {
+			if (index >= this.rules.length - 1) {
+				console.log("Index out of bounds.");
+				return;
+			}
+			let temp = this.rules.splice(index, 1)[0];
+			this.rules.splice(index + 1, 0, temp);
+		}
+		else {
+			console.log("Invalid direction");
+			return;
+		}
+		this.HTML_create();
+		return;
+	}
+
+	btn_addRule(obj) {
+		obj.addRule();
+	}
+
+	getRulesJson() {
+		let out = {"r": []};
+		for (let i = 0; i < this.rules.length; i++) {
+			out["r"].push(this.rules[i].stringify());
+		}
+		return JSON.stringify(out);
+	}
+
+	saveRules() {
+		let xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				console.log(xhttp.responseText);
+			}
+		}
+		xhttp.open("POST", this.save_url, true);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send("json=" + this.getRulesJson());
+		return;
+	}
+
+	btn_saveRules(obj) {
+		obj.saveRules();
+	}
+
+	btn_delRule(obj, index) {
+		obj.delRule(index);
+	}
+
+	btn_moveRule(obj, index, dir) {
+		obj.moveRule(index, dir);
 	}
 }

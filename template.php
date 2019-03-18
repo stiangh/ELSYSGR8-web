@@ -21,6 +21,8 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" type="text/css" href="Includes\inno8_19.css">
+		<script src="Includes\Chart.bundle.min.js"></script>
+		<script src="Includes\data-classes.js"></script>
 	</head>
 	<body>
 		<div id="header">

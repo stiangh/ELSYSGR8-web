@@ -204,7 +204,15 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.btnPause.innerHTML = "Pause";
 		this.btnPause.addEventListener('click', this.pauseClicked.bind(null, this));
 		this.spanBox.appendChild(this.btnPause);
-
+		
+		if ((this.export_handler_url != false) && (this.spn_export != false)) {
+			this.exportBtn = document.createElement("BUTTON");
+			this.exportBtn.innerHTML = "Eksporter som CSV-fil";
+			this.exportBtn.addEventListener('click', this.exportCSV.bind(null, this));
+			this.exportBtn.className = "exportBtn";
+			this.spn_export.appendChild(this.exportBtn);
+		}
+		
 		this.spnHeaders = document.createElement("p");
 		this.spanBox.appendChild(this.spnHeaders);
 
@@ -219,7 +227,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 	
 	updateMethod(obj) {
-		console.log("updateMethod called")
+		// console.log("updateMethod called")
 		var method = obj.slcMethod.value;
 		
 		switch(method) {
@@ -245,7 +253,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 	
 	updateQuery(obj) {
-		console.log("updateQuery callled");
+		// console.log("updateQuery callled");
 
 		obj.checkForm(obj);
 		
@@ -289,7 +297,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 
 	pauseClicked(obj) {
-		console.log("pauseClicked called");
+		// console.log("pauseClicked called");
 		
 		obj.paused = !obj.paused;
 		obj.btnPause.innerHTML = (obj.paused ? "Resume" : "Pause");
@@ -298,7 +306,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 	
 	showInputs(obj, bFD, bTD, bLXD, bLXS) {
-		console.log("showInputs called");
+		// console.log("showInputs called");
 		obj.slcFD.style.display = (bFD ? "initial" : "none");
 		obj.slcTD.style.display = (bTD ? "initial" : "none");
 		obj.slcLXD.style.display = (bLXD ? "initial" : "none");
@@ -310,7 +318,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		if (obj.paused) {
 			return;
 		}
-		console.log("requestData called");
+		// console.log("requestData called");
 		
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
@@ -335,13 +343,13 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 	
 	addListener(obj, sub) {
-		console.log("addListener called");
+		// console.log("addListener called");
 		obj.listeners.push(sub);
 		return;
 	}
 	
 	notifyListeners(obj, newHeaders) {
-		console.log("notifyListeners called");
+		// console.log("notifyListeners called");
 		
 		for (var i = 0; i < obj.listeners.length; i++) {
 			obj.listeners[i].getNotification(obj.listeners[i], newHeaders);
@@ -351,13 +359,13 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 	
 	setFrequency(obj, frequency) {
-		console.log("setFrequency called");
+		// console.log("setFrequency called");
 		obj.frequency = frequency;
 		return;
 	}
 	
 	setData(obj, data) {
-		console.log("setData called");
+		// console.log("setData called");
 		
 		let oldData = obj.data.slice(0);
 		obj.data = data;
@@ -399,7 +407,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	}
 
 	setHeaderBools(obj, header) {
-		console.log("setHeaderBools called.");
+		// console.log("setHeaderBools called.");
 		obj.headerBools[header] = !obj.headerBools[header];
 		obj.notifyListeners(obj, false);
 		obj.updateSelectAll(obj);
@@ -418,9 +426,12 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 
 	updateSelectAll(obj) {
 		let b = false;
+		let c = false;
 		for (let header in obj.headerBools) {
 			if (obj.headerBools[header] == false) {
 				b = true;
+			} else {
+				c = true;
 			}
 		}
 		if (b) {
@@ -431,6 +442,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 			obj.slcAll.innerHTML = "(Deselect All)";
 			obj.slcAll.onclick = obj.selectAll.bind(null, obj, true);
 		}
+		obj.exportBtn.style.display = (c == false ? "none" : "block");
 	}
 
 	setAlias(obj, header, alias) {
@@ -471,17 +483,17 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		this.tableDiv = document.getElementById(tdiv_id);
 		this.dataSet = data_set;
 		this.dataSet.addListener(this.dataSet, this);
-		this.exportBtn = document.createElement("BUTTON");
+		/* this.exportBtn = document.createElement("BUTTON");
 		this.exportBtn.innerHTML = "Eksporter som CSV-fil";
 		this.exportBtn.addEventListener('click', this.dataSet.exportCSV.bind(null, this.dataSet));
-		this.exportBtn.className = "exportBtn";
+		this.exportBtn.className = "exportBtn"; */
 		this.user = false;
 		
 		return;
 	}
 	
 	getNotification(obj, newHeaders) {
-		console.log("getNotification called");
+		// console.log("getNotification called");
 		obj.createTable(obj);
 		return;
 	}
@@ -515,7 +527,18 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 					continue;
 				}
 				var td = document.createElement("td");
-				td.innerHTML = rowData[key];
+				if (typeof rowData[key] == "string") {
+					let split = rowData[key].split(' ');
+					for (let j = 0; j < split.length; j++) {
+						td.innerHTML += split[j];
+						if (j != split.length - 1) {
+							td.innerHTML += "<wbr> ";
+						}
+					}
+				}
+				else {
+					td.innerHTML = rowData[key];
+				}
 				if ((key == "temp") && (parseFloat(rowData[key]) == 528.36)) {
 					td.style.color = "red";
 				}
@@ -533,7 +556,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		}
 		obj.tableDiv.innerHTML = "";
 		obj.tableDiv.appendChild(table);
-		obj.tableDiv.appendChild(obj.exportBtn);
+		// obj.dataSet.spn_export.appendChild(obj.exportBtn);
 		
 		return;
 	}
@@ -561,7 +584,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 
 	getNotification(obj, newHeaders) {
-		console.log("getNotification called");
+		// console.log("getNotification called");
 
 		if (newHeaders) {
 			obj.getHeaders(obj);
@@ -574,7 +597,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 
 	getHeaders(obj) {
-		console.log("getHeaders called.");
+		// console.log("getHeaders called.");
 
 		obj.headers = obj.dataset.headers;
 		var rData = obj.dataset.data;
@@ -592,7 +615,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 
 	addChart(obj, header, rData) {
-		console.log("addChart called");
+		// console.log("addChart called");
 		var aliases = obj.dataset.aliases;
 
 		var cdiv = document.createElement("div");
@@ -618,7 +641,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 				}]
 			},
 			options: {
-				aspectRatio: 2,
+				aspectRatio: (window.innerWidth > window.innerHeight ? 2 : 1.33),
 				elements: {
 					line: {
 						tension: 0
@@ -659,7 +682,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 
 	updateCharts(obj) {
-		console.log("updateCharts called");
+		// console.log("updateCharts called");
 
 		var rData = obj.dataset.data;
 		var headerBools = obj.dataset.headerBools;

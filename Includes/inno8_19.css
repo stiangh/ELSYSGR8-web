@@ -109,6 +109,10 @@ body {
 	position: relative;
 	top: 16px;
 }
+#div_table {
+	width: 100%;
+	overflow-x: auto;
+}
 .dataTable {
 	border-collapse: collapse;
 	margin: auto;
@@ -117,7 +121,7 @@ body {
 .dataTable th, .dataTable td {
 	border: solid 1px black;
 	text-align: center;
-	padding: 3px 9px 3px 9px;
+	padding: 3px 1vw 3px 1vw;
 }
 .dataTable th:first-letter, #spn_dataset p span:first-letter {
 	text-transform: capitalize;
@@ -132,10 +136,12 @@ body {
 input:not([type="checkbox"]), select, button {
 	box-sizing: border-box;
 }
-#spn_dataset input:not([type = "checkbox"]), #spn_dataset select, #spn_dataset button {
+#spn_dataset input:not([type = "checkbox"]), #spn_dataset select, #spn_dataset option, #spn_dataset button {
 	height: 25px;
 	width: 140px;
 	margin: 2px;
+	padding-inline-start: 0;
+	font-family: Arial, Helvetica, sans-serif;
 }
 #signup {
 	text-align: center;

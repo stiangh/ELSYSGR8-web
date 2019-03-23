@@ -18,7 +18,7 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Sette opp database
   - [x] Automatisk lagring av målinger fra The Things Network
   - [x] Uthenting av data fra database
-- [ ] Fremstilling av data i tabeller og grafer
+- [x] Fremstilling av data i tabeller og grafer
   - [x] Tabeller og grafer implementert
   - [x] Dynamisk oppdatering av tabeller og grafer m/AJAX
   - [x] Flere utvalg: Fra Dato til Dato, Siste antall dager, Siste antall målinger
@@ -26,7 +26,7 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Aliaser \(F.eks \"Temperatur\" istendenfor \"temp\"\)
   - [x] Mulighet til å eksportere data som CSV-fil
   - [x] Mulighet til eksportere grafer som PNG-filer
-  - [ ] Mulighet til å fargekode basert på måle-verdiene
+  - [x] Mulighet til å fargekode basert på måle-verdiene
 - [ ] Måleparametere Implementert
   - [x] Temperatur
   - [x] Turbiditet

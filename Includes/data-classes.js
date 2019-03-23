@@ -1,13 +1,22 @@
-function compareArrays(ar1, ar2) { // Funksjonen sjekker om to arrayer er like. Ulik rekkefølge på elementer vil gi false
-	if (ar1.length != ar2.length) {
-		return false;
-	}
-	for (var i = 0; i < ar1.length; i++) {
-		if (ar1[i] != ar2[i]) {
+function isEqual(var1, var2) { // Funksjonen sjekker om to arrayer er like. Ulik rekkefølge på elementer vil gi false
+	if (typeof var1 == "object") {
+		if (typeof var2 != "object") {
 			return false;
 		}
+		if (Object.keys(var1).length != Object.keys(var2).length) {
+			return false;
+		}
+		for (let key in var1) {
+			if (!(key in var2)) {
+				return false;
+			}
+			if (!isEqual(var1[key], var2[key])) {
+				return false;
+			}
+		}
+		return true;
 	}
-	return true;
+	return var1 == var2;
 }
 
 function trimOnBlur(ev) {
@@ -58,6 +67,70 @@ function loadWithRequest(method, content, page_url, newTab = false) { // Laster 
 	f.submit();
 	if (newTab) {
 		document.body.removeChild(f);
+	}
+}
+
+function hexToRgb(hex) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }else{
+        var hue2rgb = function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return {"r": Math.round(r * 255), "g": Math.round(g * 255), "b": Math.round(b * 255)};
+}
+
+function colorToRgbComponents(color) {
+	if (color[0] == "#") {return hexToRgb(color);}
+	if (color[0] == "h") { // 'hsla(h, s, l, a)'
+		let ca = color.replace('hsla(', '').replace('hsl(', '').replace(')', '').split(',');
+		let h = ca[0];
+		let s = ca[1];
+		if (s.includes('%')) {
+			let s = parseInt(s.replace('%', '')) / 100;
+		}
+		let l = ca[2];
+		if (l.includes('%')) {
+			let l = parseInt(l.replace('%', '')) / 100;
+		}
+		return hslToRgb(parseInt(h), parseFloat(s), parseFloat(l));
+	}
+	if (color[0] == "r") { // 'rgba(r, g, b, a)
+		let ca = color.replace('rgba(', '').replace('rgb(', '').replace(')', '').split(',');
+		let r = parseInt(ca[0]);
+		let g = parseInt(ca[1]);
+		let b = parseInt(ca[2]);
+		return {"r": r, "g": g, "b": b};
 	}
 }
 
@@ -286,13 +359,17 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 	setData(obj, data) {
 		console.log("setData called");
 		
+		let oldData = obj.data.slice(0);
 		obj.data = data;
+		if (isEqual(oldData, obj.data)) {
+			return;
+		}
 		var headers = [];
 		for (var key in data[0]) {
 			headers.push(key);
 		}
 		var newHeaders = false;
-		if (!compareArrays(obj.headers, headers)) {
+		if (!isEqual(obj.headers, headers)) {
 			obj.headers = headers;
 			newHeaders = true;
 			obj.headerBools = {};
@@ -398,6 +475,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		this.exportBtn.innerHTML = "Eksporter som CSV-fil";
 		this.exportBtn.addEventListener('click', this.dataSet.exportCSV.bind(null, this.dataSet));
 		this.exportBtn.className = "exportBtn";
+		this.user = false;
 		
 		return;
 	}
@@ -413,6 +491,8 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		var headers = obj.dataSet.headers;
 		var headerBools = obj.dataSet.headerBools;
 		var aliases = obj.dataSet.aliases;
+
+		let rules = obj.user.rulesByParam;
 		
 		var table = document.createElement("table");
 		table.className = "dataTable";
@@ -436,8 +516,16 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 				}
 				var td = document.createElement("td");
 				td.innerHTML = rowData[key];
-				if ((key == "temp") && (parseFloat(rowData[key]) > 100)) {
+				if ((key == "temp") && (parseFloat(rowData[key]) == 528.36)) {
 					td.style.color = "red";
+				}
+				if (key in rules) {
+					for (let ri = 0; ri < rules[key].length; ri++) {
+						let rule = rules[key][ri];
+						if (rule.testValue(rowData[key])) {
+							td.style.color = rule.color;
+						}
+					}
 				}
 				tr.appendChild(td);
 			}
@@ -448,6 +536,10 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 		obj.tableDiv.appendChild(obj.exportBtn);
 		
 		return;
+	}
+
+	setUser(user) {
+		this.user = user;
 	}
 }
 
@@ -463,6 +555,9 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			"sMin": {"temp": 0, "turb": 0, "ph": 0, "conc": 0}, 
 			"sMax": {"temp": 30, "turb": 1, "ph": 14, "conc": 1}
 		}
+		this.user = false;
+		this.defaultBorderColor = 'rgba(173, 216, 230, 1.0)';
+		this.defaultBackgroundColor = 'rgba(173, 216, 230, 0.6)';
 	}
 
 	getNotification(obj, newHeaders) {
@@ -515,13 +610,20 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			data: {
 				datasets: [{
 					label: (header in aliases ? aliases[header] : header),
-					backgroundColor: 'hsla(0, 100%, 70%, 0.6)',
-					borderColor: 'hsla(0, 100%, 70%, 1.0)',
+					// backgroundColor: 'hsla(0, 100%, 70%, 0.6)',
+					backgroundColor: obj.defaultBackgroundColor,
+					// borderColor: 'hsla(0, 100%, 70%, 1.0)',
+					borderColor: obj.defaultBorderColor,
 					data: cData
 				}]
 			},
 			options: {
 				aspectRatio: 2,
+				elements: {
+					line: {
+						tension: 0
+					}
+				},
 				scales: {
 					xAxes: [{
 						type: 'time',
@@ -539,6 +641,11 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		}
 		if (header in obj.options["sMax"]) {
 			obj.charts[header].options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
+		}
+		if ((obj.user != false) && (header in obj.user.rulesByParam)) {
+			let grd = this.makeGradientsBOBW(obj.charts[header], obj.user.rulesByParam[header]);
+			obj.charts[header].data.datasets[0].borderColor = grd.background;
+			obj.charts[header].data.datasets[0].backgroundColor = grd.background;
 		}
 		obj.charts[header].update();
 
@@ -570,6 +677,13 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			if (header in obj.options["sMax"]) {
 				chart.options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
 			}
+
+			if (header in obj.user.rulesByParam) {
+				let grd = this.makeGradientsBOBW(chart, obj.user.rulesByParam[header]);
+				chart.data.datasets[0].borderColor = grd.background;
+				chart.data.datasets[0].backgroundColor = grd.background;
+			}
+
 			chart.update();
 		}
 
@@ -582,6 +696,409 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		content.img = cvs.toDataURL("image/png");
 
 		loadWithRequest("POST", content, "Includes/save-canvas.php", false);
+	}
+
+	setUser(user) {
+		this.user = user;
+	}
+
+	makeGradientsY(chart, rules) {
+		let top = chart.chartArea.top;
+		let bottom = chart.chartArea.bottom;
+		let grdBorder = chart.ctx.createLinearGradient(0, top, 0, bottom);
+		let grdBackground = chart.ctx.createLinearGradient(0, top, 0, bottom);
+		let vTop = chart.scales["y-axis-0"].ticksAsNumbers[0];
+		let vBottom = chart.scales["y-axis-0"].ticksAsNumbers[chart.scales["y-axis-0"].ticksAsNumbers.length - 1];
+		let ranges = [];
+		for (let i = 0; i < rules.length; i++) {
+			let rule = rules[i];
+			if (rule.type != "nbt") {
+				let range = {};
+				range.color = rule.color;
+				if (rule.type == "ab") {
+					range.start = rule.v1;
+					range.stop = vTop;
+				}
+				else if (rule.type == "be") {
+					range.start = vBottom;
+					range.stop = rule.v1;
+				}
+				else if (rule.type == "bt") {
+					range.start = rule.v1;
+					range.stop = rule.v2;
+				}
+				if (range.start < range.stop) {
+					ranges.push(range);
+				}
+			}
+			else {
+				let range1 = {};
+				let range2 = {};
+				range1.color = rule.color;
+				range2.color = rule.color;
+				range1.start = vBottom;
+				range1.stop = rule.v1;
+				range2.start = rule.v2;
+				range2.stop = vTop;
+				if (range1.start < range1.stop) {
+					ranges.push(range1);
+				}
+				if (range2.start < range2.stop) {
+					ranges.push(range2);
+				}
+			}
+		}
+		for (let i = 0; i < ranges.length; i++) {
+			let iRange = ranges[i];
+			if (iRange.start < vBottom) {iRange.start = vBottom;}
+			if (iRange.stop > vTop) {iRange.stop = vtop;}
+			if (iRange.start >= iRange.stop) {
+				ranges.splice(i, 1);
+				i--;
+				continue;
+			}
+			for (let n = i + 1; n < ranges.length; n++) {
+				let nRange = ranges[n];
+				if ((iRange.start >= nRange.stop) || (iRange.stop <= nRange.start)) {
+					// Case 5 || Case 6
+					continue;
+				}
+				if (iRange.start < nRange.start) {
+					// Case 1 || 3
+					if (iRange.stop < nRange.stop) {
+						// Case 1
+						nRange.start = iRange.stop;
+					}
+					else {
+						// Case 3
+						ranges.splice(n, 1);
+						n--;
+					}
+				}
+				else {
+					// Case 2 || 4
+					if (iRange.stop < nRange.stop) {
+						// Case 4
+						let range1 = {"start": nRange.start, "stop": iRange.start, "color": nRange.color};
+						let range2 = {"start": iRange.stop, "stop": nRange.stop, "color": nRange.color};
+						ranges.splice(n, 1, range1, range2);
+						n++;
+					}
+					else {
+						// Case 2
+						nRange.stop = iRange.start;
+					}
+				}
+			}
+		}
+		if (ranges.length == 0) {
+			return {"border": this.defaultBorderColor, "background": this.defaultBackgroundColor};
+		}
+		ranges.sort(function(a,b) {return a.start - b.start;});
+		if (ranges[0].start != vBottom) {
+			let range = {"start": vBottom, "stop": ranges[0].start, "color": this.defaultBorderColor};
+			ranges.splice(0, 0, range);
+		}
+		for (let i = 0; i < ranges.length - 1; i++) {
+			if (ranges[i].stop != ranges[i + 1].start) {
+				let range = {"start": ranges[i].stop, "stop": ranges[i + 1].start, "color": this.defaultBorderColor};
+				ranges.splice(i + 1, 0, range);
+			}
+		}
+		if (ranges[ranges.length - 1].stop != vTop) {
+			let range = {"start": ranges[ranges.length - 1].stop, "stop": vTop, "color": this.defaultBorderColor};
+			ranges.push(range);
+		}
+		console.log(rules[0].param + ": ");
+		console.log(ranges);
+		for (let i = 0; i < ranges.length; i++) {
+			let range = ranges[i];
+			let p0 = 1 - range.start / (vTop - vBottom);
+			let p1 = 1 - range.stop / (vTop - vBottom);
+			let gap = p1 - p0;
+			p0 += gap * 0.05;
+			p1 -= gap * 0.05;
+			let rgb = colorToRgbComponents(range.color);
+			let colorBorder = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 1.0)';
+			let colorBackground = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.6)';
+			grdBorder.addColorStop(p0, colorBorder);
+			grdBackground.addColorStop(p0, colorBackground);
+			grdBorder.addColorStop(p1, colorBorder);
+			grdBackground.addColorStop(p1, colorBackground);
+		}
+		return {"border": grdBorder, "background": grdBackground};
+	}
+
+	makeGradientsX(chart, rules) {
+		let left = chart.chartArea.left;
+		let right = chart.chartArea.right;
+		let grdBorder = chart.ctx.createLinearGradient(left, 0, right, 0);
+		let grdBackground = chart.ctx.createLinearGradient(left, 0, right, 0);
+		let data = chart.data.datasets[0].data;
+		let metadata = chart.getDatasetMeta(0).data;
+		let points = [];
+		let pointColors = [];
+		for (let i = 0; i < data.length; i++) {
+			let point = {};
+			point.value = parseFloat(data[i].y);
+			point.posX = metadata[i]._model.x;
+			point.posY = metadata[i]._model.y
+			let flag = false;
+			for (let n = 0; n < rules.length; n++) {
+				let rule = rules[n];
+				if (rule.testValue(point.value)) {
+					flag = true;
+					point.color = rule.color;
+					break;
+				}
+			}
+			if (flag == false) {
+				point.color = this.defaultBorderColor;
+			}
+			points.push(point);
+		}
+		for (let i = 0; i < points.length; i++) {
+			let point = points[i];
+			let rgb = colorToRgbComponents(point.color);
+			let colorBorder = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 1.0)";
+			let colorBackground = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.6)";
+			pointColors.push(colorBorder);
+			let p0;
+			let p1;
+			if (i == 0) {
+				p0 = 0;
+			}
+			else {
+				let x0 = (points[i - 1].posX + point.posX) / 2;
+				p0 = (x0 - left) / (right - left);
+			}
+			if (i == points.length - 1) {
+				p1 = 1;
+			}
+			else {
+				let x1 = (point.posX + points[i + 1].posX) / 2;
+				p1 = (x1 - left) / (right - left);
+			}
+			let gap = p1 - p0;
+			if (i != 0) {
+				p0 += 0.05 * gap;
+			}
+			if (i != points.length - 1) {
+				p1 -= 0.05 * gap;
+			}
+			grdBorder.addColorStop(p0, colorBorder);
+			grdBackground.addColorStop(p0, colorBackground);
+			grdBorder.addColorStop(p1, colorBorder);
+			grdBackground.addColorStop(p1, colorBackground);
+		}
+		chart.data.datasets[0].pointBorderColor = pointColors;
+		chart.data.datasets[0].pointBackgroundColor = pointColors;
+		return {"border": grdBorder, "background": grdBackground};
+		/* let rgb0 = colorToRgbComponents(points[0].color);
+		let colorBorder0 = 'rgba(' + rgb0.r + ", " + rgb0.g + ", " + rgb0.b + ", 1.0)";
+		let colorBackground0 = 'rgba(' + rgb0.r + ", " + rgb0.g + ", " + rgb0.b + ", 0.6)";
+		let rgb1 = colorToRgbComponents(points[points.length - 1].color);
+		let colorBorder1 = 'rgba(' + rgb1.r + ", " + rgb1.g + ", " + rgb1.b + ", 1.0)";
+		let colorBackground1 = 'rgba(' + rgb1.r + ", " + rgb1.g + ", " + rgb1.b + ", 0.6)";
+		grdBorder.addColorStop(0, colorBorder0);
+		grdBackground.addColorStop(0, colorBackground0); */
+
+	}
+
+	makeGradientsBOBW(chart, rules) {
+		let left = chart.chartArea.left;
+		let right = chart.chartArea.right;
+		let grdBorder = chart.ctx.createLinearGradient(left, 0, right, 0);
+		let grdBackground = chart.ctx.createLinearGradient(left, 0, right, 0);
+		let grds = {border: grdBorder, background: grdBackground};
+		let data = chart.data.datasets[0].data;
+		let metadata = chart.getDatasetMeta(0).data;
+		let vTop = chart.scales["y-axis-0"].ticksAsNumbers[0];
+		let vBottom = chart.scales["y-axis-0"].ticksAsNumbers[chart.scales["y-axis-0"].ticksAsNumbers.length - 1];
+		let ranges = [];
+		let points = [];
+		let pointColors = [];
+		for (let i = 0; i < rules.length; i++) {
+			let rule = rules[i];
+			if (rule.type != "nbt") {
+				let range = {};
+				range.color = rule.color;
+				if (rule.type == "ab") {
+					range.start = rule.v1;
+					range.stop = vTop;
+				}
+				else if (rule.type == "be") {
+					range.start = vBottom;
+					range.stop = rule.v1;
+				}
+				else if (rule.type == "bt") {
+					range.start = rule.v1;
+					range.stop = rule.v2;
+				}
+				if (range.start < range.stop) {
+					ranges.push(range);
+				}
+			}
+			else {
+				let range1 = {};
+				let range2 = {};
+				range1.color = rule.color;
+				range2.color = rule.color;
+				range1.start = vBottom;
+				range1.stop = rule.v1;
+				range2.start = rule.v2;
+				range2.stop = vTop;
+				if (range1.start < range1.stop) {
+					ranges.push(range1);
+				}
+				if (range2.start < range2.stop) {
+					ranges.push(range2);
+				}
+			}
+		}
+		for (let i = 0; i < ranges.length; i++) {
+			let iRange = ranges[i];
+			if (iRange.start < vBottom) {iRange.start = vBottom;}
+			if (iRange.stop > vTop) {iRange.stop = vtop;}
+			if (iRange.start >= iRange.stop) {
+				ranges.splice(i, 1);
+				i--;
+				continue;
+			}
+			for (let n = i + 1; n < ranges.length; n++) {
+				let nRange = ranges[n];
+				if ((iRange.start >= nRange.stop) || (iRange.stop <= nRange.start)) {
+					continue;
+				}
+				if (iRange.start < nRange.start) {
+					if (iRange.stop < nRange.stop) {
+						nRange.start = iRange.stop;
+					}
+					else {
+						ranges.splice(n, 1);
+						n--;
+					}
+				}
+				else {
+					if (iRange.stop < nRange.stop) {
+						let range1 = {"start": nRange.start, "stop": iRange.start, "color": nRange.color};
+						let range2 = {"start": iRange.stop, "stop": nRange.stop, "color": nRange.color};
+						ranges.splice(n, 1, range1, range2);
+						n++;
+					}
+					else {
+						nRange.stop = iRange.start;
+					}
+				}
+			}
+		}
+		if (ranges.length == 0) {
+			return {"border": this.defaultBorderColor, "background": this.defaultBackgroundColor};
+		}
+		ranges.sort(function(a,b) {return a.start - b.start;});
+		if (ranges[0].start != vBottom) {
+			let range = {"start": vBottom, "stop": ranges[0].start, "color": this.defaultBorderColor};
+			ranges.splice(0, 0, range);
+		}
+		for (let i = 0; i < ranges.length - 1; i++) {
+			if (ranges[i].stop != ranges[i + 1].start) {
+				let range = {"start": ranges[i].stop, "stop": ranges[i + 1].start, "color": this.defaultBorderColor};
+				ranges.splice(i + 1, 0, range);
+			}
+		}
+		if (ranges[ranges.length - 1].stop != vTop) {
+			let range = {"start": ranges[ranges.length - 1].stop, "stop": vTop, "color": this.defaultBorderColor};
+			ranges.push(range);
+		}
+		if (ranges.length == 0) {
+			let rgb = colorToRgbComponents(ranges[0].color);
+			let borderColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 1.0)";
+			let backgroundColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.6)";
+			return {border: borderColor, background: backgroundColor};
+		}
+		for (let i = 0; i < data.length; i++) {
+			let point = {};
+			point.value = parseFloat(data[i].y);
+			point.posX = metadata[i]._model.x;
+			let flag = false;
+			for (let n = 0; n < rules.length; n++) {
+				let rule = rules[n];
+				if (rule.testValue(point.value)) {
+					flag = true;
+					point.color = rule.color;
+					break;
+				}
+			}
+			if (flag == false) {
+				point.color = this.defaultBorderColor;
+			}
+			pointColors.push(point.color);
+			points.push(point);
+		}
+		for (let i = 0; i < points.length; i++) {
+			let point = points[i];
+			if (i == 0) {
+				this.gradientsAddColorStop(grds, 0, point.color);
+			}
+			if (i == points.length - 1) {
+				this.gradientsAddColorStop(grds, 1, point.color);
+			}
+			else {
+				let nextPoint = points[i+1];
+				let a = (nextPoint.value - point.value) / (nextPoint.posX - point.posX);
+				let relevantRanges = [];
+				for (let n = 0; n < ranges.length; n++) {
+					let range = ranges[n];
+					if (!((range.stop < Math.min(point.value, nextPoint.value)) || (range.start > Math.max(nextPoint.value, point.value)))) {
+						relevantRanges.push(range);
+						if (a >= 0) {
+							if (range.start > Math.min(point.value, nextPoint.value)) {
+								let y0 = range.start;
+								// y0 = point.value + a * x0 - a * point.posX
+								// x0 = (y0 + a * point.posX - point.value) / a
+								let x0 = point.posX + (y0 - point.value) / a;
+								let p0 = (x0 - left) / (right - left);
+								this.gradientsAddColorStop(grds, p0, range.color);
+							}
+							if (range.stop < Math.max(point.value, nextPoint.value)) {
+								let y0 = range.stop;
+								let x0 = point.posX + (y0 - point.value) / a;
+								let p0 = (x0 - left) / (right - left);
+								this.gradientsAddColorStop(grds, p0, range.color);
+							}
+						}
+					}
+				}
+				if (a < 0) {
+					for (let n = relevantRanges.length - 1; n >= 0; n--) {
+						let range = relevantRanges[n];
+						if (range.start > Math.min(point.value, nextPoint.value)) {
+							let y0 = range.start;
+							let x0 = point.posX + (y0 - point.value) / a;
+							let p0 = (x0 - left) / (right - left);
+							this.gradientsAddColorStop(grds, p0, range.color);
+						}
+						if (range.stop < Math.max(point.value, nextPoint.value)) {
+							let y0 = range.stop;
+							let x0 = point.posX + (y0 - point.value) / a;
+							let p0 = (x0 - left) / (right - left);
+							this.gradientsAddColorStop(grds, p0, range.color);
+						}
+					}
+				}
+			}
+		}
+		chart.data.datasets[0].pointBorderColor = pointColors;
+		chart.data.datasets[0].pointBackgroundColor = pointColors;
+		return grds;
+	}
+
+	gradientsAddColorStop(grds, p, color) {
+		let rgb = colorToRgbComponents(color);
+		let borderColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 1.0)";
+		let backgroundColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.6)";
+		grds.border.addColorStop(p, borderColor);
+		grds.background.addColorStop(p, backgroundColor);
 	}
 }
 
@@ -606,14 +1123,6 @@ class Rule {
 		this.color = ((typeof color == undefined) || (color == "") || (color == null) ? "#ff0000" : color);
 		this.doColorCode = ((typeof doColorCode == undefined) || (doColorCode == "") || (doColorCode == null) ? false : doColorCode);
 		this.doAlert = ((typeof doAlert == undefined) || (doAlert == "") || (doAlert == null) ? false : doAlert);
-
-		if (["bt", "nbt"].includes(this.type)) {
-			console.log("minmax");
-			let min = Math.min(this.v1, this.v2);
-			let max = Math.max(this.v1, this.v2);
-			this.v1 = min;
-			this.v2 = max;
-		}
 
 		this.HTML_update();
 	}
@@ -711,7 +1220,7 @@ class Rule {
 
 		this.slcAlert = document.createElement("INPUT");
 		this.slcAlert.type = "checkbox";
-		this.slcAlert.value = this.doAlert;
+		this.slcAlert.checked = this.doAlert;
 		p.appendChild(this.slcAlert);
 
 		this.html.appendChild(p);
@@ -762,16 +1271,16 @@ class Rule {
 	}
 	
 	verify() {
-		if (!(this.param in ["temp", "turb", "ph", "conc"])) {
+		if (!(["temp", "turb", "ph", "conc"].includes(this.param))) {
 			return false;
 		}
-		if (!(this.type in ["ab", "be", "bt", "nbt"])) {
+		if (!(["ab", "be", "bt", "nbt"].includes(this.type))) {
 			return false;
 		}
 		if (isNaN(this.v1)) {
 			return false;
 		}
-		if ((this.type in ["bt", "nbt"]) && ((isNaN(this.v2)) || (this.v2 < this.v1))) {
+		if ((["bt", "nbt"].includes(this.type)) && ((isNaN(this.v2)) || (this.v2 < this.v1))) {
 			return false;
 		}
 		return true;
@@ -802,7 +1311,7 @@ class Rule {
 					return false;
 				}
 			case "nbt":
-				if (!(parseFloat(value) >= parseFloat(this.v1)) && (parseFloat(value) <= parseFloat(this.v2))) {
+				if (!((parseFloat(value) >= parseFloat(this.v1)) && (parseFloat(value) <= parseFloat(this.v2)))) {
 					return true;
 				}
 				else {
@@ -826,10 +1335,20 @@ class Rule {
 		j.doAlert = this.doAlert;
 		return JSON.stringify(j);
 	}
+
+	minmax() {
+		if (["bt", "nbt"].includes(this.type)) {
+			// console.log("minmax");
+			let min = Math.min(this.v1, this.v2);
+			let max = Math.max(this.v1, this.v2);
+			this.v1 = min;
+			this.v2 = max;
+		}
+	}
 }
 
 class User {
-	constructor(handler_url, save_url) {
+	constructor(handler_url, save_url, cbWhenLoaded=false) {
 		this.handler_url = handler_url;
 		this.save_url = save_url;
 		this.html = false;
@@ -839,7 +1358,9 @@ class User {
 		this.fname;
 		this.sname;
 		this.rules = [];
+		this.rulesByParam = {};
 		this.requestUserInfo(this);
+		this.cbWhenLoaded = cbWhenLoaded;
 	}
 
 	requestUserInfo(obj) {
@@ -864,18 +1385,17 @@ class User {
 	
 						let jr = JSON.parse(ui["rules"])["r"];
 						for (let i = 0; i < jr.length; i++) {
-							obj.rules.push(new Rule(true, jr[i]));
+							let rule = new Rule(true, jr[i]);
+							obj.rules.push(rule);
+							if (!(rule.param in obj.rulesByParam)) {
+								obj.rulesByParam[rule.param] = [];
+							}
+							obj.rulesByParam[rule.param].push(rule);
 						}
 					}
-
-					if (obj.rules.length == 0) {
-						obj.rules.push( new Rule(false) );
-					}
-
 					obj.logged_in = true;
-
-					if (obj.html != false) {
-						obj.HTML_create();
+					if (obj.cbWhenLoaded != false) {
+						obj.cbWhenLoaded();
 					}
 				}
 				return;
@@ -901,45 +1421,65 @@ class User {
 
 		for (let i = 0; i < this.rules.length; i++) {
 			let d = document.createElement("DIV");
+			d.className = "rule-container";
 			/* d.insertAdjacentHTML("beforeend", "&uarr;");
 			d.insertAdjacentHTML("beforeend", "X");
 			d.insertAdjacentHTML("beforeend", "&darr;"); */
 
-			if (i != 0) {
-				let ub = document.createElement("BUTTON");
-				ub.innerHTML = "&uarr;";
-				ub.addEventListener('click', this.btn_moveRule.bind(null, this, i, "up"));
-				d.appendChild(ub);
-			}
+			let panel = document.createElement("DIV");
+			panel.className = "rule-panel";
 
+			let up = document.createElement("DIV");
+			up.className = "rule-panel-box";
+			let ub = document.createElement("BUTTON");
+			ub.innerHTML = "&uarr;";
+			ub.addEventListener('click', this.btn_moveRule.bind(null, this, i, "up"));
+			up.appendChild(ub)
+			if (i == 0) {
+				ub.style.visibility = "hidden";
+			}
+			panel.appendChild(up);
+
+			let delp = document.createElement("DIV");
+			delp.className = "rule-panel-box";
 			let delb = document.createElement("BUTTON");
-			delb.innerHTML = "X";
+			delb.innerHTML = "&#10006;";
 			delb.addEventListener('click', this.btn_delRule.bind(null, this, i));
-			d.appendChild(delb);
+			delp.appendChild(delb);
+			panel.appendChild(delp);
 
-			if (i != this.rules.length - 1) {
-				let db = document.createElement("BUTTON");
-				db.innerHTML = "&darr;";
-				db.addEventListener('click', this.btn_moveRule.bind(null, this, i, "down"));
-				d.append(db);
+			let dp = document.createElement("DIV");
+			dp.className = "rule-panel-box";
+			let db = document.createElement("BUTTON");
+			db.innerHTML = "&darr;";
+			db.addEventListener('click', this.btn_moveRule.bind(null, this, i, "down"));
+			dp.appendChild(db);
+			if (i == this.rules.length - 1) {
+				db.style.visibility = "hidden";
 			}
+			panel.append(dp);
+
+			d.appendChild(panel);
 
 			let rd = this.rules[i].HTML_create();
-			rd.style.display = "inline-block";
+			// rd.style.display = "inline-block";
 			d.appendChild(rd);
 			this.html.appendChild(d);
 		}
 
+		let btndiv = document.createElement("DIV");
+		btndiv.className = "rule-button-container";
+
 		this.btnAddRule = document.createElement("BUTTON");
 		this.btnAddRule.innerHTML = "Ny Regel";
 		this.btnAddRule.addEventListener('click', this.btn_addRule.bind(null, this));
-		this.html.appendChild(this.btnAddRule);
+		btndiv.appendChild(this.btnAddRule);
 
 		this.btnSaveRules = document.createElement("BUTTON");
 		this.btnSaveRules.innerHTML = "Lagre regler";
 		this.btnSaveRules.addEventListener('click', this.btn_saveRules.bind(null, this));
-		this.html.appendChild(this.btnSaveRules);
-		
+		btndiv.appendChild(this.btnSaveRules);
+		this.html.appendChild(btndiv);
 		return this.html;
 	}
 
@@ -999,6 +1539,11 @@ class User {
 	}
 
 	saveRules() {
+		for (let i = 0; i < this.rules.length; i++) {
+			this.rules[i].minmax();
+			this.rules[i].HTML_update();
+		}
+
 		let xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {

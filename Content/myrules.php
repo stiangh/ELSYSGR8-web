@@ -2,8 +2,14 @@
     window.onload = setup_myrules;
 
     function setup_myrules() {
-        u = new User("Includes/userinfo-h.php", "Includes/saverules-h.php");
-        document.getElementById("div_rules").appendChild(u.HTML_create());
+        // u = new User("Includes/userinfo-h.php", "Includes/saverules-h.php");
+        user.cbWhenLoaded = function() {
+            if (user.rules.length == 0) {
+				user.rules.push( new Rule(false) );
+			}
+            document.getElementById("div_rules").innerHTML = "";
+            document.getElementById("div_rules").appendChild(user.HTML_create());
+        }
     }
 
     /* function waitOnInfo(user, counter = 25) {
@@ -16,20 +22,11 @@
         }
     } */
 
-    function newRule() {
+    /* function newRule() {
         let r = new Rule(false);
         rules.push(r);
         document.getElementById("div_rules").appendChild(r.HTML_create());
-    }
+    } */
 
 </script>
-<style>
-    .rule-div {
-        margin-bottom: 20px;
-    }
-    input:not([type='checkbox']), select, option {
-        box-sizing: border-box;
-        height: 25px;
-    }
-</style>
 <div id="div_rules"></div>

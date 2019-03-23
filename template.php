@@ -23,6 +23,9 @@
 		<link rel="stylesheet" type="text/css" href="Includes\inno8_19.css">
 		<script src="Includes\Chart.bundle.min.js"></script>
 		<script src="Includes\data-classes.js"></script>
+		<script>
+			user = new User("Includes/userinfo-h.php", "Includes/saverules-h.php");
+		</script>
 	</head>
 	<body>
 		<div id="header">
@@ -44,6 +47,7 @@
 					if ($loggedIn) {
 						echo '<div class="nav-box"><a href="downlink.php">Downlink</a></div>';
 						echo '<div class="nav-box"><a href="mypage.php">Min Side</a></div>';
+						echo '<div class="nav-box"><a href="myrules.php">Regler</a></div>';
 					}
 					else {
 						echo '<div class="nav-box"><a href="signup.php">Registrer</a></div>';

@@ -22,9 +22,11 @@
             data0.setAlias(data0, key, aliases[key]);
         }
         table0 = new Table(id_table, div_table, data0);
+        table0.setUser(user);
         charts0 = new Charts(id_charts, div_charts, data0);
+        charts0.setUser(user);
 
-        q = " <?php echo $query ?> ";
+        // <?php echo "q = ".$query." ;" ?>
     }
 </script>
 <span id="spn_dataset"></span>

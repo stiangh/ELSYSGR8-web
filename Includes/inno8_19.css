@@ -173,3 +173,38 @@ div.negative>p {
 	display: block;
 	margin: 5px auto 5px auto;
 }
+.rule-div {
+	margin-left: 45px;
+	display: inline-block;
+}
+.rule-container input:not([type='checkbox']), .rule-container select, .rule-container option {
+	box-sizing: border-box;
+	height: 25px;
+}
+.rule-panel {
+	display: inline-block;
+	flex-direction: column;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-45px);
+}
+.rule-container {
+	padding: 10px;
+	position: relative;
+}
+.rule-panel-box {
+	height: 30px;
+	width: 30px;
+}
+.rule-panel-box>button {
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
+	line-height: 100%;
+	box-sizing: border-box;
+	text-align: center;
+}
+.rule-button-container {
+	padding: 10px;
+	position: relative;
+}

@@ -27,18 +27,18 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] Mulighet til å eksportere data som CSV-fil
   - [x] Mulighet til eksportere grafer som PNG-filer
   - [x] Mulighet til å fargekode basert på måle-verdiene
-- [ ] Måleparametere Implementert
+- [x] Måleparametere Implementert
   - [x] Temperatur
   - [x] Turbiditet
   - [x] Timestamp (Fra TTN-Gatewayen som først mottok pakken)
   - [x] PH
-  - [ ] Konduktivitet
-  - [ ] Fargeanalyse
-  - [ ] Batteri%
-- [ ] Fjernstyring
+  - [x] Konduktivitet
+  - [x] Fargeanalyse
+  ~~- [ ] Batteri%~~
+- [x] Fjernstyring
   - [x] Mulighet til å legge inn downlink fra The Things Network gjennom nettsiden (Sovetid)
   - [x] Implementert i Arduino
-  - [ ] \(?\) Mulighet til å requeste ekstra måledata fra SSD
+  ~~- [ ] \(?\) Mulighet til å requeste ekstra måledata fra SSD~~
 - [ ] Design
   - [x] Et fungerende, overordnet, midlertidig design
   - [ ] Endelig navn og logo for gruppen
@@ -46,7 +46,7 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [ ] Skikkelig design for mobil
 - [x] Innlogging-system
 - [x] Varsling på E-mail
-- [ ] Informasjon om oss og vårt produkt (Noe annet enn Lorum Ipsum på forsiden)
-- [ ] .htaccess-fil
-- [ ] \(?\) Mulighet til å bruke egne algoritmer på data, kombinere data etc.
-- [ ] \(?\) Kontakt oss / Feedback - mulighet
+- [x] Informasjon om oss og vårt produkt (Noe annet enn Lorum Ipsum på forsiden)
+~~- [ ] .htaccess-fil~~
+~~- [ ] \(?\) Mulighet til å bruke egne algoritmer på data, kombinere data etc.~~
+~~- [ ] \(?\) Kontakt oss / Feedback - mulighet~~

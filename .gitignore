@@ -42,6 +42,15 @@ $RECYCLE.BIN/
 
 # Start of personal tweaks
 
+# Deprecated files
+tablegetdata-h.php
+
+# Files not in use
+CustomPA.js
+insert-from-serial.php
+SystemOverview2.png
+notify.wav
+
 # Anything placed in Tester-folder
 Tester/
 

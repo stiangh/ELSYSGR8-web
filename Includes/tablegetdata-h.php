@@ -79,6 +79,33 @@
 					die();
 				}
 				break;
+			case "s2s": 
+				{
+					if (!isset($_POST["fs"]) || !isset($_POST["ts"]) || ($_POST["fs"] == "") || ($_POST["ts"] == "") || (intval($_POST["fs"]) < 0) || (intval($_POST["ts"]) < 0)) {
+						$jsonArray["error"] = true;
+						$jsonArray["message"] = "FS and/or TS not set or invalid";
+					}
+					else {
+						$from_id = intval($_POST["fs"]);
+						$to_id = intval($_POST["ts"]);
+						if ($from_id > $to_id) {
+							$temp_id = $from_id;
+							$from_id = $to_id;
+							$to_id = $temp_id;
+						}
+
+						$sql = "SELECT * FROM $dbSamples WHERE id BETWEEN $from_id AND $to_id ORDER BY id DESC";
+						$res = mysqli_query($conn, $sql);
+
+						while ($row = mysqli_fetch_assoc($res)) {
+							array_push($jsonArray["data"], $row);
+						}
+						$jsonArray["data"] = array_reverse($jsonArray["data"], false);
+					}
+					echo json_encode($jsonArray);
+					die();
+				}
+				break;
 			default:
 				{
 					$jsonArray["error"] = true;

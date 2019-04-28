@@ -6,7 +6,7 @@
 	
 	$conn = mysqli_connect($dbServer, $dbUsername, $dbPwd, $dbName);
 
-	$dbSamples = "phtest";
+	$dbSamples = "SamplesDB";
 	$dbAlert = "alert_limits";
 	$dbUsers = "signup_test";
 	$dbRules = "rules_test";

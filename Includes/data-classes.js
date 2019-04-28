@@ -152,6 +152,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.data = [];
 		this.listeners = [];
 		this.aliases = {};
+		this.pling = new Audio("Includes/ding.m4a");
 		
 		this.slcMethod = document.createElement("select");
 		this.slcMethod.id = this.id + "_slc_method";
@@ -169,6 +170,10 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		opt3.value = "lxs";
 		opt3.selected = true;
 		this.slcMethod.appendChild(opt3);
+		var opt4 = document.createElement("option");
+		opt4.innerHTML = "Id - Id";
+		opt4.value = "s2s";
+		this.slcMethod.appendChild(opt4);
 		this.spanBox.appendChild(this.slcMethod);
 		
 		this.slcFD = document.createElement("input");
@@ -176,11 +181,21 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		this.slcFD.id = this.id + "slc_fd";
 		this.slcFD.value = dateValue(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
 		this.spanBox.appendChild(this.slcFD);
+		this.slcFS = document.createElement("input");
+		this.slcFS.type = "number";
+		this.slcFS.id = this.id + "slc_fs";
+		this.slcFS.value = 0;
+		this.spanBox.appendChild(this.slcFS);
 		this.slcTD = document.createElement("input");
 		this.slcTD.type = "date";
 		this.slcTD.id = this.id + "slc_td";
 		this.slcTD.value = dateValue(new Date());
 		this.spanBox.appendChild(this.slcTD);
+		this.slcTS = document.createElement("input");
+		this.slcTS.type = "number";
+		this.slcTS.id = this.id + "slc_ts";
+		this.slcTS.value = 20;
+		this.spanBox.appendChild(this.slcTS);
 		this.slcLXD = document.createElement("input");
 		this.slcLXD.type = "number";
 		this.slcLXD.id = this.id + "_slc_lxd";
@@ -232,15 +247,19 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		
 		switch(method) {
 			case "d2d":
-				obj.showInputs(obj, true, true, false, false);
+				obj.showInputs(obj, true, true, false, false, false, false);
 				obj.method = method;
 				break;
 			case "lxd":
-				obj.showInputs(obj, false, false, true, false);
+				obj.showInputs(obj, false, false, true, false, false, false);
 				obj.method = method;
 				break;
 			case "lxs":
-				obj.showInputs(obj, false, false, false, true);
+				obj.showInputs(obj, false, false, false, true, false, false);
+				obj.method = method;
+				break;
+			case "s2s":
+				obj.showInputs(obj, false, false, false, false, true, true);
 				obj.method = method;
 				break;
 			default:
@@ -271,6 +290,11 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 				var lxs = obj.slcLXS.value;
 				obj.query = "metode=lxs&lxs=" + lxs;
 				break;
+			case "s2s":
+				var fs = obj.slcFS.value;
+				var ts = obj.slcTS.value;
+				obj.query = "metode=s2s&fs=" + fs + "&ts=" + ts;
+				break;
 			default:
 				console.log("Invalid method");
 				return;
@@ -294,6 +318,16 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 			if (parseInt(obj.slcLXS.value) !== obj.slcLXS.value) {obj.slcLXS.value = Math.round(obj.slcLXS.value);}
 			if (parseInt(obj.slcLXS.value) <= 0) {obj.slcLXS.value = 1;}
 		}
+		if (obj.slcFS.value == "") {obj.slcFS.value = 0;}
+		else {
+			if (parseInt(obj.slcFS.value) !== obj.slcFS.value) {obj.slcFS.value = Math.round(obj.slcFS.value);}
+			if (parseInt(obj.slcFS.value) < 0) {obj.slcFS.value = 0;}
+		}
+		if (obj.slcTS.value == "") {obj.slcTS.value = 20;}
+		else {
+			if (parseInt(obj.slcTS.value) !== obj.slcTS.value) {obj.slcTS.value = Math.round(obj.slcTS.value);}
+			if (parseInt(obj.slcTS.value) < 0) {obj.slcTS.value = 0;}
+		}
 	}
 
 	pauseClicked(obj) {
@@ -305,12 +339,14 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		return;
 	}
 	
-	showInputs(obj, bFD, bTD, bLXD, bLXS) {
+	showInputs(obj, bFD, bTD, bLXD, bLXS, bFS, bTS) {
 		// console.log("showInputs called");
 		obj.slcFD.style.display = (bFD ? "initial" : "none");
 		obj.slcTD.style.display = (bTD ? "initial" : "none");
 		obj.slcLXD.style.display = (bLXD ? "initial" : "none");
 		obj.slcLXS.style.display = (bLXS ? "initial" : "none");
+		obj.slcFS.style.dislay = (bFS ? "initial" : "none");
+		obj.slcTS.style.display = (bTS ? "initial" : "none");
 		return;
 	}
 	
@@ -401,6 +437,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 			}
 			obj.spnHeaders.appendChild(obj.slcAll);
 		}
+		obj.pling.play();
 		obj.notifyListeners(obj, newHeaders)
 		
 		return;
@@ -527,7 +564,7 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 					continue;
 				}
 				var td = document.createElement("td");
-				if (typeof rowData[key] == "string") {
+				if (key == "time") {
 					let split = rowData[key].split(' ');
 					for (let j = 0; j < split.length; j++) {
 						td.innerHTML += split[j];
@@ -536,11 +573,11 @@ class Table { // Klasse som lager tabell basert på data fra data-settet
 						}
 					}
 				}
+				else if (!(["id", "time", "red", "blue", "green"].includes(key))) {
+					td.innerHTML = parseFloat(rowData[key]).toFixed(2);
+				}
 				else {
 					td.innerHTML = rowData[key];
-				}
-				if ((key == "temp") && (parseFloat(rowData[key]) == 528.36)) {
-					td.style.color = "red";
 				}
 				if (key in rules) {
 					for (let ri = 0; ri < rules[key].length; ri++) {
@@ -575,12 +612,12 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 		this.headers = [];
 		this.charts = {}; // "header/key": chart.js;
 		this.options = {
-			"sMin": {"temp": 0, "turb": 0, "ph": 0, "conc": 0}, 
-			"sMax": {"temp": 30, "turb": 1, "ph": 14, "conc": 1}
+			"sMin": {"temp": 0, "turb": 0, "ph": 0, "conc": 0, "red": 0, "green": 0, "blue": 0}, 
+			"sMax": {"temp": 30, "turb": 1, "ph": 14, "conc": 1, "red": 255, "green": 255, "blue": 255}
 		}
 		this.user = false;
 		this.defaultBorderColor = 'rgba(173, 216, 230, 1.0)';
-		this.defaultBackgroundColor = 'rgba(173, 216, 230, 0.6)';
+		this.defaultBackgroundColor = 'rgba(173, 216, 230, 0.4)';
 	}
 
 	getNotification(obj, newHeaders) {
@@ -628,13 +665,14 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 
 		var cData = r2c(rData, header);
 
-		obj.charts[header] = new Chart(ctx, {
+		let config = {
 			type: 'line',
 			data: {
 				datasets: [{
 					label: (header in aliases ? aliases[header] : header),
 					// backgroundColor: 'hsla(0, 100%, 70%, 0.6)',
 					backgroundColor: obj.defaultBackgroundColor,
+					// fill: false,
 					// borderColor: 'hsla(0, 100%, 70%, 1.0)',
 					borderColor: obj.defaultBorderColor,
 					data: cData
@@ -653,20 +691,45 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 						distribution: 'linear'
 					}],
 					yAxes: [{
-						type: 'linear'
+						type: 'linear',
+						ticks: {}
 					}]
 				}
-			}
-		});
-
+			}/* ,
+			parameter: header,
+			parent: obj,
+			plugins: [{
+				beforeDraw: function(chart, options) {
+					let obj = chart.config.parent;
+					if ((obj.user != "false") && (obj.user.logged_in == true)) {
+						let param = chart.config.parameter;
+						let rules = obj.user.rulesByParam[param];
+						let grd = obj.makeGradientsY(chart, rules);
+						let ctx = chart.ctx;
+						let ca = chart.chartArea;
+	
+						ctx.save();
+						ctx.fillStyle = grd.background;
+						ctx.fillRect(ca.left, ca.top, ca.right - ca.left, ca.bottom - ca.top);
+						ctx.restore();
+					}
+				}
+			}] */
+		};
 		if (header in obj.options["sMin"]) {
-			obj.charts[header].options.scales.yAxes[0].ticks.suggestedMin = parseFloat(obj.options["sMin"][header]);
+			// obj.charts[header].options.scales.yAxes[0].ticks.suggestedMin = parseFloat(obj.options["sMin"][header]);
+			config.options.scales.yAxes[0].ticks.suggestedMin = parseFloat(obj.options["sMin"][header]);
 		}
 		if (header in obj.options["sMax"]) {
-			obj.charts[header].options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
+			// obj.charts[header].options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
+			config.options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
 		}
+		// obj.charts[header].update();
+		obj.charts[header] = new Chart(ctx, config);
+		
 		if ((obj.user != false) && (header in obj.user.rulesByParam)) {
-			let grd = this.makeGradientsBOBW(obj.charts[header], obj.user.rulesByParam[header]);
+			//let grd = obj.makeGradientsBOBW(obj.charts[header], obj.user.rulesByParam[header]);
+			let grd = obj.makeGradientsBOBW(obj.charts[header], obj.user.rulesByParam[header]);
 			obj.charts[header].data.datasets[0].borderColor = grd.background;
 			obj.charts[header].data.datasets[0].backgroundColor = grd.background;
 		}
@@ -700,6 +763,8 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			if (header in obj.options["sMax"]) {
 				chart.options.scales.yAxes[0].ticks.suggestedMax = parseFloat(obj.options["sMax"][header]);
 			}
+
+			chart.update();
 
 			if (header in obj.user.rulesByParam) {
 				let grd = this.makeGradientsBOBW(chart, obj.user.rulesByParam[header]);
@@ -839,8 +904,8 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 			let p0 = 1 - range.start / (vTop - vBottom);
 			let p1 = 1 - range.stop / (vTop - vBottom);
 			let gap = p1 - p0;
-			p0 += gap * 0.05;
-			p1 -= gap * 0.05;
+			p0 += gap * 0.01;
+			p1 -= gap * 0.01;
 			let rgb = colorToRgbComponents(range.color);
 			let colorBorder = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 1.0)';
 			let colorBackground = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.6)';
@@ -1080,13 +1145,13 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 								// y0 = point.value + a * x0 - a * point.posX
 								// x0 = (y0 + a * point.posX - point.value) / a
 								let x0 = point.posX + (y0 - point.value) / a;
-								let p0 = (x0 - left) / (right - left);
+								let p0 = (x0 - left) / (right - left) + 10**(-5);
 								this.gradientsAddColorStop(grds, p0, range.color);
 							}
 							if (range.stop < Math.max(point.value, nextPoint.value)) {
 								let y0 = range.stop;
 								let x0 = point.posX + (y0 - point.value) / a;
-								let p0 = (x0 - left) / (right - left);
+								let p0 = (x0 - left) / (right - left) - 10**(-5);
 								this.gradientsAddColorStop(grds, p0, range.color);
 							}
 						}
@@ -1098,13 +1163,13 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 						if (range.start > Math.min(point.value, nextPoint.value)) {
 							let y0 = range.start;
 							let x0 = point.posX + (y0 - point.value) / a;
-							let p0 = (x0 - left) / (right - left);
+							let p0 = (x0 - left) / (right - left) - 10**(-5);
 							this.gradientsAddColorStop(grds, p0, range.color);
 						}
 						if (range.stop < Math.max(point.value, nextPoint.value)) {
 							let y0 = range.stop;
 							let x0 = point.posX + (y0 - point.value) / a;
-							let p0 = (x0 - left) / (right - left);
+							let p0 = (x0 - left) / (right - left) + 10**(-5);
 							this.gradientsAddColorStop(grds, p0, range.color);
 						}
 					}
@@ -1117,6 +1182,9 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 
 	gradientsAddColorStop(grds, p, color) {
+		if (color == "#ff8000") {
+			console.log(p);
+		}
 		let rgb = colorToRgbComponents(color);
 		let borderColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 1.0)";
 		let backgroundColor = 'rgba(' + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.6)";
@@ -1125,7 +1193,7 @@ class Charts { // Grafer implementert vha Chart.js (Chart.bundle.min.js må inkl
 	}
 }
 
-class Rule {
+class Rule { // Brukerdefinerte regler for fargekoding og mail
 	constructor(bJson, json, param, type, v1, v2, color, doColorCode, doAlert) {
 		this.html = false;
 		this.ALLOWED_PARAMS = {"temp": "Temperatur", "turb": "Turbiditet", "ph": "PH", "conc": "Konduktivitet"};
@@ -1370,7 +1438,7 @@ class Rule {
 	}
 }
 
-class User {
+class User { // Samler data om brukeren og gir mulighet til å endre regler
 	constructor(handler_url, save_url, cbWhenLoaded=false) {
 		this.handler_url = handler_url;
 		this.save_url = save_url;

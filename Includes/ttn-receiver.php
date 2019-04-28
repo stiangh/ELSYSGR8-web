@@ -1,6 +1,15 @@
 <?php // This file receives the json-object from TTN, and inserts data into the database
 	include_once "dbh.php";
 
+	function ttn_timestamp_to_timestring($timestamp) {
+		str_replace('Z', '', $timestamp);
+		$time_array = explode('T', $timestamp);
+		$date = explode('-', $time_array[0]);
+		$time = explode(':', $time_array[1]);
+		$gmt_string = $date[0]."-".$date[1]."-".$date[2]." ".$time[0].":".$time[1].":".substr($time[2], 0, 2);
+		return date("Y-m-d H:i:s", strtotime("+2 hour", strtotime($gmt_string))); // Arduino kan ikke sommertid, og tror den er i Storbritannia
+	}
+
 	$headers = getallheaders();
 	
 	// Check authorization
@@ -22,18 +31,23 @@
 		$se = substr($time[2], 0, 2);
 		$timestampraw = "$yyyy-$mm-$dd $hh:$mi:$se";
 		$dateraw = strtotime("+1 hour", strtotime($timestampraw));
-		$phpdate = date("Y-m-d H:i:s", $dateraw);
+		// $phpdate = date("Y-m-d H:i:s", $dateraw);
+		$phpdate = ttn_timestamp_to_timestring($json_array['metadata']['time']);
 		
 		// Prepare statements for MySQL-database
 		// The name of the table, the structure and the variables will need to change when we implement more parameters
-		$stmt = $conn->prepare("INSERT INTO $dbSamples (time, temp, turb, ph) VALUES (?, ?, ?, ?)");
-		$stmt->bind_param('sddd', $p_time, $p_temp, $p_turb, $p_ph);
+		$stmt = $conn->prepare("INSERT INTO $dbSamples (time, temp, turb, ph, conc, red, green, blue) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+		$stmt->bind_param('sddddiii', $p_time, $p_temp, $p_turb, $p_ph, $p_conc, $p_red, $p_green, $p_blue);
 		
 		$p_time = $phpdate;
 		if (isset($json_array['payload_fields']['data'])) {
 			$p_temp = $json_array['payload_fields']['data'][0]['value'];
 			$p_turb = $json_array['payload_fields']['data'][1]['value'];
 			$p_ph = $json_array['payload_fields']['data'][2]['value'];
+			$p_conc = $json_array['payload_fields']['data'][3]['value'];
+			$p_red = $json_array['payload_fields']['data'][4]['value'];
+			$p_green = $json_array['payload_fields']['data'][5]['value'];
+			$p_blue = $json_array['payload_fields']['data'][6]['value'];
 		}
 		else {
 			$p_temp = $json_array['payload_fields']['temp'];

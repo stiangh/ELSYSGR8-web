@@ -7,7 +7,7 @@
 			
 	function oppstart() {
         var id_dataset = "data0";
-        var handler_url = "Includes/tablegetdata-h.php";
+        var handler_url = "Includes/getsamples-h.php";
         var spn_dataset = "spn_dataset";
         var export_handler_url = "Includes/export-csv.php";
         var spn_export_id = "spn_dataset_export";
@@ -15,7 +15,7 @@
         var div_table = "div_table";
         var id_charts = "charts0";
         var div_charts = "div_charts";
-        var aliases = {"id": "Id", "time": "Måletidspunkt", "temp": "Temperatur", "turb": "Turbiditet", "ph": "PH"};
+        var aliases = {"id": "Id", "time": "Måletidspunkt", "temp": "Temperatur", "turb": "Turbiditet", "ph": "PH", "conc": "Konduktivitet", "red": "R", "blue": "B", "green": "G"};
                 
         data0 = new Dataset(id_dataset, handler_url, spn_dataset, export_handler_url, spn_export_id);
         for (var key in aliases) {

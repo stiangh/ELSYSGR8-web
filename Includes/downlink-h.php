@@ -10,6 +10,7 @@
 		$confirmed = false;
 		
 		$slpt = intval($_POST['slpt']);
+		if ($slpt > 65535) {$slpt = 65535;}
 		$payload_fields = array( "auth" => "i819", "sleeptime" => $slpt );
 		
 		$json_array = array( "dev_id" => $dev_id, "port" => $port, "confirmed" => $confirmed, "payload_fields" => $payload_fields );

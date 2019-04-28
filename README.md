@@ -34,11 +34,11 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
   - [x] PH
   - [x] Konduktivitet
   - [x] Fargeanalyse
-  ~~- [ ] Batteri%~~
+  - [ ] ~~Batteri%~~
 - [x] Fjernstyring
   - [x] Mulighet til å legge inn downlink fra The Things Network gjennom nettsiden (Sovetid)
   - [x] Implementert i Arduino
-  ~~- [ ] \(?\) Mulighet til å requeste ekstra måledata fra SSD~~
+  - [ ] ~~\(?\) Mulighet til å requeste ekstra måledata fra SSD~~
 - [ ] Design
   - [x] Et fungerende, overordnet, midlertidig design
   - [ ] Endelig navn og logo for gruppen
@@ -47,6 +47,6 @@ Kom gjerne med spørsmål og innspill. Jeg må bare beklage at koden knapt er ko
 - [x] Innlogging-system
 - [x] Varsling på E-mail
 - [x] Informasjon om oss og vårt produkt (Noe annet enn Lorum Ipsum på forsiden)
-~~- [ ] .htaccess-fil~~
-~~- [ ] \(?\) Mulighet til å bruke egne algoritmer på data, kombinere data etc.~~
-~~- [ ] \(?\) Kontakt oss / Feedback - mulighet~~
+- [ ] ~~.htaccess-fil~~
+- [ ] ~~\(?\) Mulighet til å bruke egne algoritmer på data, kombinere data etc.~~
+- [ ] ~~\(?\) Kontakt oss / Feedback - mulighet~~

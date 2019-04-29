@@ -345,7 +345,7 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		obj.slcTD.style.display = (bTD ? "initial" : "none");
 		obj.slcLXD.style.display = (bLXD ? "initial" : "none");
 		obj.slcLXS.style.display = (bLXS ? "initial" : "none");
-		obj.slcFS.style.dislay = (bFS ? "initial" : "none");
+		obj.slcFS.style.display = (bFS ? "initial" : "none");
 		obj.slcTS.style.display = (bTS ? "initial" : "none");
 		return;
 	}

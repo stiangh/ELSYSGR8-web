@@ -2,11 +2,11 @@
     include_once "dbh.php"; // Setter opp kontakt med database og inneholder tabellnavn etc.
     date_default_timezone_set("Europe/Oslo");
     
-    $out = array("error" => false, "message" => "", "data" => array()); // Instansierer respons-objektet
+    $out = array("error" => false, "msg" => "", "data" => array()); // Instansierer respons-objektet
 
     function error($msg) { // Denne funksjonen benyttes når det oppstår en feil
         $out["error"] = true;
-        $out["message"] = $msg;
+        $out["msg"] = $msg;
         die(json_encode($out));
     }
 

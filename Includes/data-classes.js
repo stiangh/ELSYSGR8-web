@@ -350,31 +350,32 @@ class Dataset { // Klasse som innhenter data baser på bruker-input, og informer
 		return;
 	}
 	
-	requestData(obj) {
-		if (obj.paused) {
+	requestData(obj) { // obj er her Dataset-objektet
+		// Det er denne funksjonen som kalles hvert 5. sekund
+		if (obj.paused) { // Sjekker om pause-knappen er trykket
 			return;
 		}
-		// console.log("requestData called");
-		
-		var xhttp = new XMLHttpRequest();
+		var xhttp = new XMLHttpRequest(); // Instansierer forespørsellen
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				var rt = xhttp.responseText;
-				var jsonArray = JSON.parse(rt);
-				//console.log(jsonArray.message);
-				if (jsonArray.error) {
+				// Dette utføres når serveren har respondert
+				var rt = xhttp.responseText; // Henter responsen
+				var jsonArray = JSON.parse(rt); // Dekoder JSON til objekt
+				if (jsonArray.error) { // Sjekker feil-status
 					console.log("AJAX Request failed");
-					console.log(jsonArray.message);
+					console.log(jsonArray.msg); // Skriver evt. feilmelding til konsoll
 				}
 				else {
-					obj.setData(obj, jsonArray.data);
+					obj.setData(obj, jsonArray.data); // Lagrer den tilsendte dataen
+					// setData-funksjonenen gir også beskjed til Table- og Charts-element
 				}
 				return;
 			}
 		}
-		xhttp.open("POST", obj.handler, true);
+		xhttp.open("POST", obj.handler, true); // handler inneholder adressen til kodefilen, i dette tilfellet "Includes/getsamples-h.php"
 		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		xhttp.send(obj.query);
+		xhttp.send(obj.query); // Argumentene i forespørselen ligger i query
+		// query kan f.eks være "?metode=lxs&lxs=20", da vil serveren hente de siste 20 målingene
 		return;
 	}
 	
